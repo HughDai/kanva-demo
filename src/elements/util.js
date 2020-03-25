@@ -67,4 +67,22 @@ export class CustomLayer extends Konva.Layer {
   constructor () {
     super()
   }
+
+  customAdd (...children) {
+    this.add(...children)
+    let tr = new Konva.Transformer({
+      // borderStrokeWidth: 1,
+      // anchorStrokeWidth: 1,
+      rotateAnchorOffset: 20,
+      borderDash: [3, 2]
+      // enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
+    })
+    let child = children[0]
+    if (!child.hasName('lineGroup')) {
+      this.add(tr)
+      tr.attachTo(child)
+    }
+    this.draw()
+    this.getParent().fire('dragmove')
+  }
 }

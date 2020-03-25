@@ -11,6 +11,7 @@ const DEFAULT_CONFIG = {
   y: 100,
   radius: 100,
   fill: '',
+  dash: DASH,
   stroke: STROKE_COLOR,
   strokeWidth: STROKE_WIDTH,
   draggable: true

@@ -15,6 +15,7 @@ const DEFAULT_CONFIG = {
   outerRadius: 100,
   angle: 180,
   rotation: 180,
+  dash: DASH,
   fill: '',
   stroke: STROKE_COLOR,
   strokeWidth: STROKE_WIDTH,

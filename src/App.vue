@@ -30,6 +30,27 @@
     <button @click="clear">清屏</button>
     <button @click="undo">撤销</button>
     <button @click="redo">重做</button>
+    <br>
+    <label>填充</label>
+    <select @change="handleFillChange">
+      <option value="">空心</option>
+      <option value="red">红色</option>
+    </select>
+    <label>描边</label>
+    <select @change="handleStrokeChange">
+      <option value="red">红色</option>
+      <option value="black">黑色</option>
+    </select>
+    <label>虚实线</label>
+    <select @change="handleDashChange">
+      <option value="0">实线</option>
+      <option value="1">虚线</option>
+    </select>
+    <label>线宽</label>
+    <select @change="handleStrokeWidthChange">
+      <option value="1">1</option>
+      <option value="2">2</option>
+    </select>
     <div id="container"></div>
     <div id="preview"></div>
   </div>
@@ -43,7 +64,7 @@ import SemiCircle from '@/elements/semicircle'
 import Polygon from '@/elements/polygon'
 import Triangle from '@/elements/triangle'
 import Rect from '@/elements/rect'
-import { TriangleSceneFunc, RectSceneFunc } from '@/elements/util'
+import { TriangleSceneFunc, RectSceneFunc, CustomLayer } from '@/elements/util'
 
 export default {
   name: "App",
@@ -62,7 +83,13 @@ export default {
       isPaint: false,
       lastLine: null,
       isDrawing: false,
-      selectedElement: null
+      selectedElement: null,
+      config: {
+        fill: '',
+        stroke: 'red',
+        strokeWidth: 1,
+        dashEnabled: false
+      }
     }
   },
   mounted () {
@@ -72,7 +99,7 @@ export default {
       height: 750
     })
 
-    this.layer = new Konva.Layer()
+    this.layer = new CustomLayer()
     this.stage.add(this.layer)
 
     this.brushLayer = new Konva.Layer()
@@ -106,7 +133,7 @@ export default {
         }
         this.stage.find('Transformer').destroy()
 
-        var tr = new Konva.Transformer({
+        let tr = new Konva.Transformer({
           borderStrokeWidth: 1,
           anchorStrokeWidth: 1,
           rotateAnchorOffset: 20,
@@ -230,48 +257,59 @@ export default {
       // document.getElementById('preview').src = url
     },
     addRect () {
-      let rect = new Rect({ mode: this.rectMode }).create()
+      let rect = new Rect({
+        mode: this.rectMode,
+        ...this.config
+      }).create()
       console.log(rect)
-      this.layer.add(rect)
+      this.layer.customAdd(rect)
       this.layer.draw()
     },
     addSemicircle () {
-      let semicircle = new SemiCircle().create()
-      this.layer.add(semicircle)
+      let semicircle = new SemiCircle({
+        ...this.config
+      }).create()
+      this.layer.customAdd(semicircle)
       this.layer.draw()
     },
     addCenterSemicircle () {
-      let semicircle = new SemiCircle().createWithCenter()
-      this.layer.add(semicircle)
+      let semicircle = new SemiCircle({
+        ...this.config
+      }).createWithCenter()
+      this.layer.customAdd(semicircle)
       this.layer.draw()
     },
     addCircle () {
-      let circle = new Circle().create()
-      this.layer.add(circle)
+      let circle = new Circle({
+        ...this.config
+      }).create()
+      this.layer.customAdd(circle)
       this.layer.draw()
     },
     addCircleWithCenter () {
-      let group = new Circle().createWithCenter()
-      this.layer.add(group)
+      let group = new Circle({
+        ...this.config
+      }).createWithCenter()
+      this.layer.customAdd(group)
       this.layer.batchDraw()
     },
     addStraight () {
-      let lineGrpoup = new Line({ layer: this.layer }).draw()
+      let lineGrpoup = new Line({ layer: this.layer, ...this.config }).draw()
       console.log(lineGrpoup)
-      this.layer.add(lineGrpoup)
+      this.layer.customAdd(lineGrpoup)
       this.layer.batchDraw()
     },
     addPolygon () {
       console.log(Konva)
-      const polygon = new Polygon({ sides: Number(this.side) }).drawRegular()
-      this.layer.add(polygon)
+      const polygon = new Polygon({ sides: Number(this.side), ...this.config }).drawRegular()
+      this.layer.customAdd(polygon)
       this.layer.draw()
       console.log('after add polygon =======', this.stage.toJSON())
     },
     addTriangle () {
-      const triangle = new Triangle({ mode: this.triangleMode }).create()
+      const triangle = new Triangle({ mode: this.triangleMode, ...this.config }).create()
       console.log(triangle)
-      this.layer.add(triangle)
+      this.layer.customAdd(triangle)
       this.layer.draw()
     },
     handleModeChange (e) {
@@ -286,6 +324,19 @@ export default {
       console.log(e)
       this.rectMode = e.target.value
     },
+    handleFillChange (e) {
+      this.config.fill = e.target.value
+    },
+    handleStrokeChange (e) {
+      this.config.stroke = e.target.value
+    },
+    handleDashChange (e) {
+      console.log()
+      this.config.dashEnabled = !!Number(e.target.value)
+    },
+    handleStrokeWidthChange (e) {
+      this.config.strokeWidth = Number(e.target.value)
+    }
   }
 }
 </script>
@@ -307,7 +358,7 @@ export default {
 }
 #preview {
   position: absolute;
-  top: 50px;
+  top: 80px;
   left: 750px;
   width: 250px;
   height: 187.5px;

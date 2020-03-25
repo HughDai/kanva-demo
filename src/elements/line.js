@@ -9,7 +9,7 @@ const ANCHOR_WIDTH = STROKE_WIDTH * 4
 
 const DEFAULT_CONFIG = {
   name: 'straightLine',
-  points: [30, 60, 90, 120],
+  points: [100, 100, 200, 200],
   stroke: STROKE_COLOR,
   strokeWidth: 1,
   tension: 1,
@@ -32,6 +32,7 @@ export default class Line {
 
   draw () {
     this.group = new Konva.Group({
+      name: 'lineGroup',
       width: 10,
       draggable: true,
       hitStrokeWidth: 20
@@ -45,15 +46,7 @@ export default class Line {
   }
 
   drawLine () {
-    this.line = new Konva.Line({
-      name: 'straightLine',
-      points: [30, 60, 90, 120],
-      stroke: STROKE_COLOR,
-      strokeWidth: 1,
-      tension: 1,
-      // dash: [10, 5],
-      hitStrokeWidth: 20
-    })
+    this.line = new Konva.Line(this.options)
   }
 
   drawAnchors (line) {
@@ -62,7 +55,7 @@ export default class Line {
       name: 'lineAnchor',
       x: line.points()[0],
       y: line.points()[1],
-      fill: STROKE_COLOR,
+      // fill: STROKE_COLOR,
       radius: ANCHOR_WIDTH,
       stroke: STROKE_COLOR,
       strokeWidth: STROKE_WIDTH,
@@ -73,7 +66,7 @@ export default class Line {
       name: 'lineAnchor',
       x: line.points()[2],
       y: line.points()[3],
-      fill: STROKE_COLOR,
+      // fill: STROKE_COLOR,
       radius: ANCHOR_WIDTH,
       stroke: STROKE_COLOR,
       strokeWidth: STROKE_WIDTH,

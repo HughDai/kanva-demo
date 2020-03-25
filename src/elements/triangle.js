@@ -13,6 +13,7 @@ const DEFAULT_CONFIG = {
   sides: 3,
   width: 200,
   height: 200,
+  dash: DASH,
   stroke: STROKE_COLOR,
   strokeWidth: STROKE_WIDTH,
   draggable: true
