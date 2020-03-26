@@ -7,6 +7,8 @@
       <option value="rhombus">菱形</option>
       <option value="trapezoid">梯形</option>
     </select>
+    <button @click="addCustom">任意多边形</button>
+    <button @click="quitCustom">退出任意多边形</button>
     <button @click="addPolygon">多边形</button>
     <input type="text" v-model="side" style="width: 15px;">
     <button @click="addTriangle">三角形</button>
@@ -64,13 +66,11 @@ import SemiCircle from '@/elements/semicircle'
 import Polygon from '@/elements/polygon'
 import Triangle from '@/elements/triangle'
 import Rect from '@/elements/rect'
-import { TriangleSceneFunc, RectSceneFunc, CustomLayer } from '@/elements/util'
+import Custom from '@/elements/custom'
+import { TriangleSceneFunc, RectSceneFunc, PolygonSceneFunc, CustomLayer } from '@/elements/util'
 
 export default {
   name: "App",
-  components: {
-    // straightLine
-  },
   data () {
     return {
       stage: {},
@@ -106,12 +106,10 @@ export default {
     this.stage.add(this.brushLayer)
 
     this.attachStageEvents()
-
-    Konva.Triangle = Triangle
   },
   methods: {
     attachStageEvents () {
-      this.stage.on('click tap', e => {
+      this.stage.on('click', e => {
         console.log(e.target)
         let target = e.target
         if (target === this.stage) {
@@ -134,8 +132,6 @@ export default {
         this.stage.find('Transformer').destroy()
 
         let tr = new Konva.Transformer({
-          borderStrokeWidth: 1,
-          anchorStrokeWidth: 1,
           rotateAnchorOffset: 20,
           borderDash: [3, 2]
           // enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
@@ -146,7 +142,7 @@ export default {
         this.selectedElement = target
       })
 
-      this.stage.on('dragmove', () => {
+      this.stage.on('dragmove', e => {
         this.preview()
       })
     },
@@ -170,9 +166,8 @@ export default {
         console.log(pos)
         this.lastLine = new Konva.Line({
           name: 'line',
-          stroke: 'red',
-          strokeWidth: 5,
-          // lineJoin: 'bevel',
+          stroke: this.config.stroke,
+          strokeWidth: this.config.strokeWidth,
           globalCompositeOperation: this.mode === 'brush' ? 'source-over' : 'destination-out',
           points: [pos.x, pos.y]
         })
@@ -236,7 +231,8 @@ export default {
       this.previewStage = Konva.Node.create(obj, 'preview')
       let triangleShapes = this.previewStage.find('.right, .isosceles, .equilateral')
       let rectShapes = this.previewStage.find('.rhombus, .trapezoid')
-      console.log('triangleShapes----------', triangleShapes)
+      let customShapes = this.previewStage.find('.custom')
+
       if (triangleShapes.length > 0) {
         triangleShapes.forEach(shape => {
           shape.sceneFunc((context, s) => {
@@ -248,6 +244,14 @@ export default {
         rectShapes.forEach(shape => {
           shape.sceneFunc((context, s) => {
             RectSceneFunc[shape.name()](context, s)
+          })
+        })
+      }
+      if (customShapes.length > 0) {
+        customShapes.forEach(shape => {
+          console.log(shape)
+          shape.sceneFunc((context, s) => {
+            PolygonSceneFunc.custom(context, s)
           })
         })
       }
@@ -311,6 +315,15 @@ export default {
       console.log(triangle)
       this.layer.customAdd(triangle)
       this.layer.draw()
+    },
+    addCustom () {
+      let custom = new Custom({ layer: this.layer, ...this.config })
+      custom.callback = () => {
+        this.quitCustom()
+      }
+    },
+    quitCustom () {
+      this.detachDrawEvents()
     },
     handleModeChange (e) {
       console.log(e)

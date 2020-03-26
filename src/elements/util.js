@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import Konva from 'konva'
 
 export const TriangleSceneFunc = {
@@ -63,6 +64,21 @@ export const RectSceneFunc = {
   }
 }
 
+export const PolygonSceneFunc = {
+  custom (context, shape) {
+    const points = shape.attrs.points
+    // const { x, y } = shape.position()
+    context.beginPath()
+    context.moveTo(points[0].x, points[0].y)
+    for (let i = 1; i < points.length; i++) {
+      context.lineTo(points[i].x, points[i].y)
+    }
+    context.closePath()
+    context.fillStrokeShape(shape)
+    console.log('position========', shape.position())
+  }
+}
+
 export class CustomLayer extends Konva.Layer {
   constructor () {
     super()
@@ -71,8 +87,6 @@ export class CustomLayer extends Konva.Layer {
   customAdd (...children) {
     this.add(...children)
     let tr = new Konva.Transformer({
-      // borderStrokeWidth: 1,
-      // anchorStrokeWidth: 1,
       rotateAnchorOffset: 20,
       borderDash: [3, 2]
       // enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
@@ -81,6 +95,7 @@ export class CustomLayer extends Konva.Layer {
     if (!child.hasName('lineGroup')) {
       this.add(tr)
       tr.attachTo(child)
+      
     }
     this.draw()
     this.getParent().fire('dragmove')

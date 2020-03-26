@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
   stroke: STROKE_COLOR,
   strokeWidth: 1,
   tension: 1,
-  // dash: [10, 5],
+  dash: DASH,
   hitStrokeWidth: 20
 }
 
@@ -22,7 +22,6 @@ export default class Line {
     options = options || {}
     this.instance = null
     this.options = Object.assign(DEFAULT_CONFIG, options)
-    this.stage = options.stage
     this.layer = options.layer
     this.group = null
     this.line = null
@@ -111,14 +110,3 @@ export default class Line {
     group.getLayer().draw()
   }
 }
-// group.on('click mouseenter mouseover', () => {
-//   stage.container().style.cursor = 'move'
-//   console.log('line mouseover')
-//   setAnchorsVisible(true)
-// })
-
-// group.on('mouseleave', () => {
-//   stage.container().style.cursor = 'default'
-//   console.log('line mouseleave')
-//   setAnchorsVisible(false)
-// })
