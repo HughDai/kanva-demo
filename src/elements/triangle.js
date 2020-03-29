@@ -8,8 +8,6 @@ const STROKE_WIDTH = 1
 const DASH = [10, 5]
 
 const DEFAULT_CONFIG = {
-  x: 150,
-  y: 150,
   sides: 3,
   width: 200,
   height: 200,

@@ -80,12 +80,14 @@ export const PolygonSceneFunc = {
 }
 
 export class CustomLayer extends Konva.Layer {
-  constructor () {
-    super()
+  constructor (options) {
+    super(options)
+    this.selectedElement = null
   }
 
   customAdd (...children) {
     this.add(...children)
+    this.find('Transformer').destroy()
     let tr = new Konva.Transformer({
       rotateAnchorOffset: 20,
       borderDash: [3, 2]
@@ -95,9 +97,9 @@ export class CustomLayer extends Konva.Layer {
     if (!child.hasName('lineGroup')) {
       this.add(tr)
       tr.attachTo(child)
-      
+      this.selectedElement = child
     }
     this.draw()
-    this.getParent().fire('dragmove')
+    this.getStage().fire('dragmove')
   }
 }

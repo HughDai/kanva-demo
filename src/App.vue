@@ -83,8 +83,9 @@ export default {
       isPaint: false,
       lastLine: null,
       isDrawing: false,
-      selectedElement: null,
       config: {
+        x: 300,
+        y: 200,
         fill: '',
         stroke: 'red',
         strokeWidth: 1,
@@ -113,7 +114,7 @@ export default {
         console.log(e.target)
         let target = e.target
         if (target === this.stage) {
-          this.selectedElement = null
+          this.layer.selectedElement = null
           this.stage.find('Transformer').destroy()
           this.stage.find('.lineAnchor').destroy()
           this.layer.draw()
@@ -122,7 +123,7 @@ export default {
         } else if (target.hasName('straightLine') || target.hasName('lineAnchor')) {
           target = target.getParent()
           Line.addAnchors(target)
-          this.selectedElement = target
+          this.layer.selectedElement = target
           return
         } else if (target.hasName('line')) {
           return
@@ -139,7 +140,8 @@ export default {
         this.layer.add(tr)
         tr.attachTo(target)
         this.layer.draw()
-        this.selectedElement = target
+        console.log(tr.anchorStroke())
+        this.layer.selectedElement = target
       })
 
       this.stage.on('dragmove', e => {
@@ -188,11 +190,12 @@ export default {
       })
     },
     remove () {
-      if (this.selectedElement === null) {
+      const element = this.layer.selectedElement
+      if (element === null) {
         alert('请先选中图形')
         return
       }
-      this.selectedElement.remove()
+      element.remove()
       this.stage.find('Transformer').destroy()
       this.layer.draw()
       this.preview()
@@ -298,10 +301,11 @@ export default {
       this.layer.batchDraw()
     },
     addStraight () {
-      let lineGrpoup = new Line({ layer: this.layer, ...this.config }).draw()
+      const { x, y, ...others } = this.config
+      let lineGrpoup = new Line({ layer: this.layer, ...others })
       console.log(lineGrpoup)
-      this.layer.customAdd(lineGrpoup)
-      this.layer.batchDraw()
+      // this.layer.customAdd(lineGrpoup)
+      // this.layer.batchDraw()
     },
     addPolygon () {
       console.log(Konva)

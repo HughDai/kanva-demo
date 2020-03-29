@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
   x: 100,
   y: 150,
   sides: 5,
-  radius: 100,
+  radius: 150,
   dash: DASH,
   stroke: STROKE_COLOR,
   strokeWidth: STROKE_WIDTH,
@@ -30,7 +30,7 @@ export default class Polygon {
     this.instance = polygon
     return this.instance
   }
-  
+
   drawCustom () {
 
   }

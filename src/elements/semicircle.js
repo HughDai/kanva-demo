@@ -41,7 +41,10 @@ export default class Semicircle {
   }
 
   createWithCenter () {
-    const options = Object.assign({}, DEFAULT_CONFIG, { name: 'circleWithCenter', draggable: false })
+    const options = Object.assign(
+      this.options,
+      { name: 'circleWithCenter', draggable: false }
+    )
     const arc = new Konva.Arc(options)
     const centerPoint = new Konva.Circle({
       name: 'circleCenter',

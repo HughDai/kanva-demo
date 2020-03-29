@@ -1,11 +1,10 @@
 /* eslint-disable */ 
 import Konva from 'konva'
-// import { assign } from '@/utils'
 
 const STROKE_COLOR = 'red'
 const STROKE_WIDTH = 1
 const DASH = [10, 5]
-const ANCHOR_WIDTH = STROKE_WIDTH * 4
+const ANCHOR_WIDTH = STROKE_WIDTH * 10
 
 const DEFAULT_CONFIG = {
   name: 'straightLine',
@@ -23,10 +22,59 @@ export default class Line {
     this.instance = null
     this.options = Object.assign(DEFAULT_CONFIG, options)
     this.layer = options.layer
+    this.stage = this.layer.getStage()
     this.group = null
     this.line = null
     this.tlAnchor = null
     this.brAnchor = null
+    this.isDrawing = false
+    this.init()
+  }
+
+  init () {
+    this.group = this.createGroup()
+
+    this.stage.on('mousedown touchstart', e => {
+      this.isDrawing = true
+      const pos = this.stage.getPointerPosition()
+      this.originPosition = pos
+      this.line = new Konva.Line({
+        name: 'straightLine',
+        points: [pos.x, pos.y],
+        ...this.options
+      })
+      this.group.add(this.line)
+      this.layer.add(this.group)
+    })
+
+    this.stage.on('mousemove touchmove', e => {
+      if (!this.isDrawing) return
+      const pos = this.stage.getPointerPosition()
+      const newPoints = [
+        this.originPosition.x,
+        this.originPosition.y,
+        pos.x,
+        pos.y
+      ]
+      console.log(newPoints)
+      this.line.points(newPoints)
+      this.layer.batchDraw()
+    })
+
+    this.stage.on('mouseup touchend', e => {
+      this.isDrawing = false
+      this.line = null
+      this.group = this.createGroup()
+    })
+  }
+
+  createGroup () {
+    return new Konva.Group({
+      name: 'lineGroup',
+      width: 10,
+      draggable: true,
+      hitStrokeWidth: 20
+    }) 
   }
 
   draw () {
@@ -45,64 +93,61 @@ export default class Line {
   }
 
   drawLine () {
-    this.line = new Konva.Line(this.options)
+    const { x, y, ...others } = this.options
+    this.line = new Konva.Line(others)
   }
 
-  drawAnchors (line) {
-    line = line || this.line
-    this.tlAnchor = new Konva.Circle({
+  static createAnchors (line) {
+    const tlAnchor = new Konva.Rect({
       name: 'lineAnchor',
-      x: line.points()[0],
-      y: line.points()[1],
-      // fill: STROKE_COLOR,
-      radius: ANCHOR_WIDTH,
-      stroke: STROKE_COLOR,
-      strokeWidth: STROKE_WIDTH,
+      x: line.points()[0] - ANCHOR_WIDTH,
+      y: line.points()[1] - ANCHOR_WIDTH,
+      width: ANCHOR_WIDTH,
+      height: ANCHOR_WIDTH,
+      stroke: '#00a1ff',
+      strokeWidth: 1,
       draggable: true
     })
 
-    this.brAnchor = new Konva.Circle({
+    const brAnchor = new Konva.Rect({
       name: 'lineAnchor',
       x: line.points()[2],
       y: line.points()[3],
-      // fill: STROKE_COLOR,
-      radius: ANCHOR_WIDTH,
-      stroke: STROKE_COLOR,
-      strokeWidth: STROKE_WIDTH,
+      width: ANCHOR_WIDTH,
+      height: ANCHOR_WIDTH,
+      stroke: '#00a1ff',
+      strokeWidth: 1,
       draggable: true
     })
+    return [tlAnchor, brAnchor]
   }
 
-  updateLine (line, layer) {
-    console.log(this)
-    line = line || this.line
-    layer = layer || this.layer
+  static updateLine (line, layer, anchors) {
     const points = [
-      this.tlAnchor.x(),
-      this.tlAnchor.y(),
-      this.brAnchor.x(),
-      this.brAnchor.y(),
+      anchors[0].x() + ANCHOR_WIDTH,
+      anchors[0].y() + ANCHOR_WIDTH,
+      anchors[1].x(),
+      anchors[1].y(),
     ]
-    console.log(points)
     line.points(points)
     layer.batchDraw()
   }
 
   static addAnchors (group) {
-    let anchors = group.find('Circle')
+    let anchors = group.find('Rect')
     if (anchors.length > 0) return
     let layer = group.getLayer()
     let line = group.findOne('Line')
-    const instance = new this()
-    instance.drawAnchors(line)
-    instance.tlAnchor.on('dragmove', () => { instance.updateLine(line, layer) })
-    instance.brAnchor.on('dragmove', () => { instance.updateLine(line, layer) })
-    group.add(instance.tlAnchor, instance.brAnchor)
+    anchors = this.createAnchors(line)
+    anchors.forEach(anchor => {
+      anchor.on('dragmove', () => { this.updateLine(line, layer, anchors) })
+    })
+    group.add(...anchors)
     layer.draw()
   }
 
   static removeAnchors (group) {
-    let anchors = group.find('Circle')
+    let anchors = group.find('Rect')
     if (anchors.length === 0) return
     anchors.forEach(e => {
       e.destroy()

@@ -30,7 +30,10 @@ export default class Circle {
   }
 
   createWithCenter () {
-    const options = Object.assign({}, DEFAULT_CONFIG, { name: 'circleWithCenter', draggable: false })
+    const options = Object.assign(
+      this.options,
+      { name: 'circleWithCenter', draggable: false }
+    )
     const circle = new Konva.Circle(options)
     const centerPoint = new Konva.Circle({
       name: 'circleCenter',

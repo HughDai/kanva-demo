@@ -51,14 +51,18 @@ export default class Rect {
 
   createRectangle () {
     this.options.name = 'rectange'
-    const { height, ...others } = this.options
-    let newH = others.width / 2
-    return new Konva.Rect({ height: newH, ...others })
+    const { width, height, ...others } = this.options
+    let newW = width * 1.5
+    let newH = height * Math.sin(Math.PI * 60 / 180)
+    console.log(newW * newH)
+    return new Konva.Rect({ width: newW, height: newH, ...others })
   }
 
   createRhombus () {
     this.options.name = 'rhombus'
-    const rhombus = new Konva.Shape(this.options)
+    const { height, ...others } = this.options
+    let newH = height * Math.sin(Math.PI * 60 / 180)
+    const rhombus = new Konva.Shape({ height: newH, ...others })
     
     rhombus.sceneFunc((context, shape) => {
       RectSceneFunc.rhombus(context, shape)
@@ -68,7 +72,10 @@ export default class Rect {
 
   createTrapezoid () {
     this.options.name = 'trapezoid'
-    const trapezoid = new Konva.Shape(this.options)
+    const { height, ...others } = this.options
+    let newH = height * Math.sin(Math.PI * 60 / 180)
+    
+    const trapezoid = new Konva.Shape({ height: newH, ...others })
     
     trapezoid.sceneFunc((context, shape) => {
       RectSceneFunc.trapezoid(context, shape)
