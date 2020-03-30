@@ -22,11 +22,10 @@
     <button @click="addCircleWithCenter">圆心圆</button>
     <button @click="addSemicircle">半圆</button>
     <button @click="addCenterSemicircle">圆心半圆</button>
-    <select @change="handleModeChange">
-      <option value="brush">画笔</option>
-      <option value="eraser">橡皮</option>
-    </select>
-    <button @click="draw">{{isDrawing ? '退出画笔' : '画笔'}}</button>
+    <br>
+    <button @click="draw('brush')">画笔</button>
+    <button @click="draw('eraser')">橡皮</button>
+    <button @click="handleModeChange">{{isBrushMode ? '退出画笔' : '画笔模式'}}</button>
     <button @click="preview">预览</button>
     <button @click="remove">删除</button>
     <button @click="clear">清屏</button>
@@ -60,7 +59,9 @@
 
 <script>
 /* eslint-disable */ 
+import { mapState, mapMutations } from 'vuex'
 import Line from '@/elements/line'
+import Brush from '@/elements/brush'
 import Circle from '@/elements/circle'
 import SemiCircle from '@/elements/semicircle'
 import Polygon from '@/elements/polygon'
@@ -77,12 +78,10 @@ export default {
       layer: {},
       previewStage: null,
       mode: 'brush',
+      isBrushMode: false,
       triangleMode: 'equilateral',
       rectMode: 'square',
       side: 5,
-      isPaint: false,
-      lastLine: null,
-      isDrawing: false,
       config: {
         x: 300,
         y: 200,
@@ -93,6 +92,12 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapState([
+      'stageHistory',
+      'stageHistoryStep'
+    ])
+  },
   mounted () {
     this.stage = new Konva.Stage({
       container: 'container',
@@ -100,20 +105,30 @@ export default {
       height: 750
     })
 
-    this.layer = new CustomLayer()
+    this.layer = new CustomLayer({ name: 'customLayer' })
     this.stage.add(this.layer)
 
-    this.brushLayer = new Konva.Layer()
+    this.brushLayer = new Konva.Layer({ name: 'brushLayer' })
     this.stage.add(this.brushLayer)
+
+    this.INITHISTORY(this.stage.toJSON())
 
     this.attachStageEvents()
   },
   methods: {
+    ...mapMutations([
+      'INITHISTORY',
+      'PUSHHISTORY',
+      'CLEARHOSTORY',
+      'REDO',
+      'UNDO'
+    ]),
     attachStageEvents () {
-      this.stage.on('click', e => {
+      this.stage.on('click tap', e => {
         console.log(e.target)
         let target = e.target
         if (target === this.stage) {
+          console.log('-------target is stage---------')
           this.layer.selectedElement = null
           this.stage.find('Transformer').destroy()
           this.stage.find('.lineAnchor').destroy()
@@ -121,15 +136,20 @@ export default {
           this.preview()
           return
         } else if (target.hasName('straightLine') || target.hasName('lineAnchor')) {
+          // e.evt.cancelBubble = true
           target = target.getParent()
           Line.addAnchors(target)
           this.layer.selectedElement = target
           return
         } else if (target.hasName('line')) {
+          e.evt.cancelBubble = true
           return
         } else if (target.hasName('circleWithCenter') || target.hasName('circleCenter')) {
           target = target.getParent()
         }
+
+        // e.evt.cancelBubble = true
+
         this.stage.find('Transformer').destroy()
 
         let tr = new Konva.Transformer({
@@ -145,54 +165,64 @@ export default {
       })
 
       this.stage.on('dragmove', e => {
+        console.log('stage dragmove')
         this.preview()
+      })
+
+      this.stage.on('mouseup touchend dragend', e => {
+        const stageJSON = this.stage.toJSON()
+        const lastStageJSON = this.stageHistory[this.stageHistoryStep]
+        console.log('stagejson====', stageJSON)
+        console.log('laststagejson====', lastStageJSON)
+        console.log(stageJSON !== lastStageJSON)
+        if (stageJSON !== lastStageJSON) {
+          this.PUSHHISTORY(stageJSON)
+        }
       })
     },
     detachDrawEvents () {
       this.stage.off('mousedown touchstart mouseup touchend mousemove touchmove')
     },
-    draw () {
-      this.isDrawing = !this.isDrawing
-      if (this.isDrawing) {
-        this.layer.hitGraphEnabled(false)
-        this.brushLayer.hitGraphEnabled(true)
-      } else {
-        this.layer.hitGraphEnabled(true)
-        this.brushLayer.hitGraphEnabled(false)
-        this.detachDrawEvents()
-        return
-      }
-      this.stage.on('mousedown touchstart', () => {
-        this.isPaint = true
-        const pos = this.stage.getPointerPosition()
-        console.log(pos)
-        this.lastLine = new Konva.Line({
-          name: 'line',
-          stroke: this.config.stroke,
-          strokeWidth: this.config.strokeWidth,
-          globalCompositeOperation: this.mode === 'brush' ? 'source-over' : 'destination-out',
-          points: [pos.x, pos.y]
-        })
-        this.brushLayer.add(this.lastLine)
+    redo () {
+      this.REDO()
+      this.reload()
+    },
+    undo () {
+      this.UNDO()
+      this.reload()
+    },
+    reload () {
+      const lastStageJSON = this.stageHistory[this.stageHistoryStep]
+      console.log('stage object ---- ', this.stage.toObject())
+      console.log('lastStageJSON reload ----- ', lastStageJSON)
+      const stageObj = JSON.parse(lastStageJSON)
+      let customLayerData = stageObj.children[0]
+      let brushLayerData = stageObj.children[1]
+
+      this.layer.removeChildren()
+      customLayerData.children.forEach(child => {
+        let node = Konva.Node.create(child)
+        this.layer.add(node)
       })
-      this.stage.on('mouseup touchend', () => {
-        this.isPaint = false
+      this.redrawWithSceneFunc(this.layer)
+      this.layer.batchDraw()
+
+      this.brushLayer.removeChildren()
+      brushLayerData.children.forEach(child => {
+        let node = Konva.Node.create(child)
+        this.layer.add(node)
       })
-      this.stage.on('mousemove touchmove', () => {
-        if (!this.isPaint) {
-          return
-        }
-        const pos = this.stage.getPointerPosition()
-        var newPoints = this.lastLine.points().concat([pos.x, pos.y])
-        this.lastLine.points(newPoints)
-        console.log(newPoints)
-        this.brushLayer.batchDraw()
-      })
+      this.layer.batchDraw()
+      this.brushLayer.batchDraw()
+    },
+    draw (mode) {
+      if (!this.isBrushMode) return
+      new Brush({ layer: this.brushLayer, mode, ...this.config })
     },
     remove () {
       const element = this.layer.selectedElement
       if (element === null) {
-        alert('请先选中图形')
+        alert('please select one graph')
         return
       }
       element.remove()
@@ -211,16 +241,10 @@ export default {
       // this.stage.clear()
       this.preview()
     },
-    redo () {
-
-    },
-    undo () {
-
-    },
     preview () {
       if (this.previewStage) this.previewStage.destroy()
-      console.log('json------', this.stage.toJSON())
-      console.log('object------', this.stage.toObject())
+      // console.log('json------', this.stage.toJSON())
+      // console.log('object------', this.stage.toObject())
       let obj = this.stage.toObject()
       Object.assign(obj.attrs, {
         width: window.innerWidth / 4,
@@ -229,12 +253,15 @@ export default {
         scaleY: 1 / 4,
         container: 'preview'
       })
-      console.log(obj)
 
       this.previewStage = Konva.Node.create(obj, 'preview')
-      let triangleShapes = this.previewStage.find('.right, .isosceles, .equilateral')
-      let rectShapes = this.previewStage.find('.rhombus, .trapezoid')
-      let customShapes = this.previewStage.find('.custom')
+      this.redrawWithSceneFunc(this.previewStage)
+      this.previewStage.draw()
+    },
+    redrawWithSceneFunc (stage) {
+      let triangleShapes = stage.find('.right, .isosceles, .equilateral')
+      let rectShapes = stage.find('.rhombus, .trapezoid')
+      let customShapes = stage.find('.custom')
 
       if (triangleShapes.length > 0) {
         triangleShapes.forEach(shape => {
@@ -258,10 +285,6 @@ export default {
           })
         })
       }
-      this.previewStage.draw()
-
-      // const url = this.stage.toDataURL()
-      // document.getElementById('preview').src = url
     },
     addRect () {
       let rect = new Rect({
@@ -301,11 +324,9 @@ export default {
       this.layer.batchDraw()
     },
     addStraight () {
+      this.detachDrawEvents()
       const { x, y, ...others } = this.config
-      let lineGrpoup = new Line({ layer: this.layer, ...others })
-      console.log(lineGrpoup)
-      // this.layer.customAdd(lineGrpoup)
-      // this.layer.batchDraw()
+      new Line({ layer: this.layer, ...others })
     },
     addPolygon () {
       console.log(Konva)
@@ -321,6 +342,7 @@ export default {
       this.layer.draw()
     },
     addCustom () {
+      this.detachDrawEvents()
       let custom = new Custom({ layer: this.layer, ...this.config })
       custom.callback = () => {
         this.quitCustom()
@@ -329,9 +351,17 @@ export default {
     quitCustom () {
       this.detachDrawEvents()
     },
-    handleModeChange (e) {
-      console.log(e)
-      this.mode = e.target.value
+    handleModeChange () {
+      this.isBrushMode = !this.isBrushMode
+      if (this.isBrushMode) {
+        this.layer.hitGraphEnabled(false)
+        this.brushLayer.hitGraphEnabled(true)
+      } else {
+        this.layer.hitGraphEnabled(true)
+        this.brushLayer.hitGraphEnabled(false)
+        this.detachDrawEvents()
+        return
+      }
     },
     handleTriangleModeChange (e) {
       console.log(e)
@@ -375,7 +405,7 @@ export default {
 }
 #preview {
   position: absolute;
-  top: 80px;
+  top: 100px;
   left: 750px;
   width: 250px;
   height: 187.5px;

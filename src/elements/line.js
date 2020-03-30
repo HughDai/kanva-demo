@@ -8,7 +8,6 @@ const ANCHOR_WIDTH = STROKE_WIDTH * 10
 
 const DEFAULT_CONFIG = {
   name: 'straightLine',
-  points: [100, 100, 200, 200],
   stroke: STROKE_COLOR,
   strokeWidth: 1,
   tension: 1,
@@ -25,8 +24,6 @@ export default class Line {
     this.stage = this.layer.getStage()
     this.group = null
     this.line = null
-    this.tlAnchor = null
-    this.brAnchor = null
     this.isDrawing = false
     this.init()
   }
@@ -35,6 +32,7 @@ export default class Line {
     this.group = this.createGroup()
 
     this.stage.on('mousedown touchstart', e => {
+      if (e.target !== this.stage) return
       this.isDrawing = true
       const pos = this.stage.getPointerPosition()
       this.originPosition = pos
@@ -48,7 +46,7 @@ export default class Line {
     })
 
     this.stage.on('mousemove touchmove', e => {
-      if (!this.isDrawing) return
+      if (!this.isDrawing || e.target !== this.stage) return
       const pos = this.stage.getPointerPosition()
       const newPoints = [
         this.originPosition.x,
@@ -75,26 +73,6 @@ export default class Line {
       draggable: true,
       hitStrokeWidth: 20
     }) 
-  }
-
-  draw () {
-    this.group = new Konva.Group({
-      name: 'lineGroup',
-      width: 10,
-      draggable: true,
-      hitStrokeWidth: 20
-    })
-    this.drawLine()
-    this.drawAnchors()
-    this.tlAnchor.on('dragmove', () => { this.updateLine() })
-    this.brAnchor.on('dragmove', () => { this.updateLine() })
-    this.group.add(this.line, this.tlAnchor, this.brAnchor)
-    return this.group
-  }
-
-  drawLine () {
-    const { x, y, ...others } = this.options
-    this.line = new Konva.Line(others)
   }
 
   static createAnchors (line) {
@@ -140,7 +118,10 @@ export default class Line {
     let line = group.findOne('Line')
     anchors = this.createAnchors(line)
     anchors.forEach(anchor => {
-      anchor.on('dragmove', () => { this.updateLine(line, layer, anchors) })
+      anchor.on('dragmove', e => {
+        e.evt.cancelBubble = true
+        this.updateLine(line, layer, anchors)
+      })
     })
     group.add(...anchors)
     layer.draw()

@@ -30,6 +30,7 @@ export default class Custom {
 
   init () {
     this.stage.on('mousedown touchstart', e => {
+      if (e.target !== this.stage) return
       this.isDrawing = true
       const pos = this.stage.getPointerPosition()
       console.log(pos)
@@ -55,7 +56,7 @@ export default class Custom {
     })
 
     this.stage.on('mousemove touchmove', e => {
-      if (!this.isDrawing) {
+      if (!this.isDrawing || e.target !== this.stage) {
         return
       }
       const pos = this.stage.getPointerPosition()
