@@ -40,13 +40,11 @@ export default class Line {
         globalCompositeOperation: this.mode === 'brush' ? 'source-over' : 'destination-out',
         points: [pos.x, pos.y]
       })
-      this.layer.add(this.line)
     })
 
     this.stage.on('mousemove touchmove', () => {
-      if (!this.isDrawing) {
-        return
-      }
+      if (!this.isDrawing) return
+      if (!this.line.getLayer()) this.layer.add(this.line)
       const pos = this.stage.getPointerPosition()
       var newPoints = this.line.points().concat([pos.x, pos.y])
       this.line.points(newPoints)

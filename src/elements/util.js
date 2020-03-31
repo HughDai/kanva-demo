@@ -14,12 +14,11 @@ export const TriangleSceneFunc = {
 
   equilateral (context, shape) {
     const height = shape.height()
-    const y = Math.tan(60 * Math.PI / 180) * height / 2
-    console.log(y)
+    const x = Math.tan(30 * Math.PI / 180) * height
     context.beginPath()
-    context.moveTo(height / 2, height - y)
+    context.moveTo(x, 0)
     context.lineTo(0, height)
-    context.lineTo(height, height)
+    context.lineTo(x * 2, height)
     context.closePath()
     context.fillStrokeShape(shape)
   },

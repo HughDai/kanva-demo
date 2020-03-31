@@ -1,6 +1,5 @@
 /* eslint-disable */ 
 import Konva from 'konva'
-import { assign } from '@/utils'
 import { RectSceneFunc } from './util'
 
 const STROKE_COLOR = 'red'
@@ -8,10 +7,6 @@ const STROKE_WIDTH = 1
 const DASH = [10, 5]
 
 const DEFAULT_CONFIG = {
-  x: 120,
-  y: 120,
-  width: 200,
-  height: 200,
   dash: DASH,
   stroke: STROKE_COLOR,
   strokeWidth: STROKE_WIDTH,
@@ -21,14 +16,45 @@ const DEFAULT_CONFIG = {
 export default class Rect {
   constructor (options) {
     options = options || {}
+    const { layer, ...others } = options
+    this.layer = layer
+    this.stage = layer.getStage()
     this.mode = options.mode || 'square'
-    this.instance = null
-    this.options = assign(DEFAULT_CONFIG, options)
+    this.rect = null
+    this.isDrawing = false
+    this.options = Object.assign(DEFAULT_CONFIG, others)
+    this.init()
+  }
+
+  init () {
+    this.stage.on('mousedown touchstart', e => {
+      if (e.target !== this.stage) return
+      this.isDrawing = true
+      const pos = this.stage.getPointerPosition()
+      this.rect = this.create()
+      this.rect.position(pos)
+    })
+
+    this.stage.on('mousemove touchmove', e => {
+      if (!this.isDrawing || e.target !== this.stage) return
+      if (!this.rect.getLayer()) this.layer.add(this.rect)
+      const pos = this.stage.getPointerPosition()
+      const { x, y } = this.rect.position()
+      let size = { width: pos.x - x, height: pos.y - y }
+      if (this.mode === 'square') {
+        size.width = size.height
+      }
+      this.rect.size(size)
+      this.layer.draw()
+    })
+
+    this.stage.on('mouseup touchend', e => {
+      this.isDrawing = false
+    })
   }
 
   create () {
     let rect = null
-    console.log(this.options)
     const mode = this.options.mode
     switch (mode) {
       case 'rectangle':
@@ -42,7 +68,6 @@ export default class Rect {
         break
       default:
         this.options.name = 'square'
-        this.options.height = DEFAULT_CONFIG.height
         rect = new Konva.Rect(this.options)
         break
     }
@@ -51,18 +76,12 @@ export default class Rect {
 
   createRectangle () {
     this.options.name = 'rectange'
-    const { width, height, ...others } = this.options
-    let newW = width * 1.5
-    let newH = height * Math.sin(Math.PI * 60 / 180)
-    console.log(newW * newH)
-    return new Konva.Rect({ width: newW, height: newH, ...others })
+    return new Konva.Rect(this.options)
   }
 
   createRhombus () {
     this.options.name = 'rhombus'
-    const { height, ...others } = this.options
-    let newH = height * Math.sin(Math.PI * 60 / 180)
-    const rhombus = new Konva.Shape({ height: newH, ...others })
+    const rhombus = new Konva.Rect(this.options)
     
     rhombus.sceneFunc((context, shape) => {
       RectSceneFunc.rhombus(context, shape)
@@ -72,10 +91,7 @@ export default class Rect {
 
   createTrapezoid () {
     this.options.name = 'trapezoid'
-    const { height, ...others } = this.options
-    let newH = height * Math.sin(Math.PI * 60 / 180)
-    
-    const trapezoid = new Konva.Shape({ height: newH, ...others })
+    const trapezoid = new Konva.Rect(this.options)
     
     trapezoid.sceneFunc((context, shape) => {
       RectSceneFunc.trapezoid(context, shape)

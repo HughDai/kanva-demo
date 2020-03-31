@@ -7,10 +7,7 @@ const STROKE_WIDTH = 1
 const DASH = [10, 5]
 
 const DEFAULT_CONFIG = {
-  x: 100,
-  y: 150,
   sides: 5,
-  radius: 150,
   dash: DASH,
   stroke: STROKE_COLOR,
   strokeWidth: STROKE_WIDTH,
@@ -20,18 +17,38 @@ const DEFAULT_CONFIG = {
 export default class Polygon {
   constructor (options) {
     options = options || {}
-    this.instance = null
-    this.options = assign(DEFAULT_CONFIG, options)
+    const { layer, ...others } = options
+    this.layer = layer
+    this.stage = layer.getStage()
+    this.polygon = null
+    this.isDrawing = false
+    this.options = assign(DEFAULT_CONFIG, others)
+    this.init()
   }
 
-  drawRegular () {
-    console.log(this.options)
-    const polygon = new Konva.RegularPolygon(this.options)
-    this.instance = polygon
-    return this.instance
-  }
+  init () {
+    this.stage.on('mousedown touchstart', e => {
+      if (e.target !== this.stage) return
+      this.isDrawing = true
+      const pos = this.stage.getPointerPosition()
+      this.polygon = new Konva.RegularPolygon({
+        name: 'regularPolygon',
+        x: pos.x,
+        y: pos.y,
+        ...this.options
+      })
+    })
 
-  drawCustom () {
+    this.stage.on('mousemove touchmove', e => {
+      if (!this.isDrawing || e.target !== this.stage) return
+      if (!this.polygon.getLayer()) this.layer.add(this.polygon)
+      const pos = this.stage.getPointerPosition()
+      this.polygon.radius(pos.y - this.polygon.y())
+      this.layer.draw()
+    })
 
+    this.stage.on('mouseup touchend', e => {
+      this.isDrawing = false
+    })
   }
 }

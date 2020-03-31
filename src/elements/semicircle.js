@@ -1,16 +1,11 @@
 /* eslint-disable */ 
 import Konva from 'konva'
-import { assign } from '@/utils'
 
 const STROKE_COLOR = 'red'
 const STROKE_WIDTH = 1
 const DASH = [10, 5]
 
 const DEFAULT_CONFIG = {
-  x: 200,
-  y: 200,
-  width: 200,
-  height: 100,
   innerRadius: 0,
   outerRadius: 100,
   angle: 180,
@@ -25,41 +20,62 @@ const DEFAULT_CONFIG = {
 export default class Semicircle {
   constructor (options) {
     options = options || {}
-    this.instance = null
-    this.options = assign({}, DEFAULT_CONFIG, options)
+    const { layer, center, ...others } = options
+    this.layer = layer
+    this.stage = layer.getStage()
+    this.center = !!center
+    this.arc = null
+    this.circleCenter = null
+    this.group = null
+    this.isDrawing = false
+    this.options = Object.assign(DEFAULT_CONFIG, options)
+    this.init()
   }
 
-  create (options) {
-    const { radius } = this.options
-    // this.options.width = radius * 2
-    // this.options.height = radius * 2
-    const arc = new Konva.Arc(this.options)
-    // circle.sceneFunc((context, shape) => {
-
-    // })
-    return arc
-  }
-
-  createWithCenter () {
-    const options = Object.assign(
-      this.options,
-      { name: 'circleWithCenter', draggable: false }
-    )
-    const arc = new Konva.Arc(options)
-    const centerPoint = new Konva.Circle({
-      name: 'circleCenter',
-      x: arc.x(),
-      y: arc.y(),
-      radius: STROKE_WIDTH * 4,
-      fill: STROKE_COLOR,
-      draggable: false
+  init () {
+    this.stage.on('mousedown touchstart', e => {
+      if (e.target !== this.stage) return
+      this.isDrawing = true
+      const pos = this.stage.getPointerPosition()
+      this.arc = new Konva.Arc({
+        x: pos.x,
+        y: pos.y,
+        ...this.options
+      })
+      if (this.center) {
+        this.group = new Konva.Group({
+          draggable: true,
+          hitStrokeWidth: 20
+        })
+        this.circleCenter = new Konva.Circle({
+          name: 'circleCenter',
+          x: pos.x,
+          y: pos.y,
+          radius: STROKE_WIDTH * 4,
+          fill: 'black',
+          draggable: false
+        })
+        this.arc.name('circleWithCenter')
+        this.arc.draggable(false)
+        this.group.add(this.arc, this.circleCenter)
+        console.log(this.group.getLayer())
+      } 
     })
-    const group = new Konva.Group({
-      width: 100,
-      draggable: true,
-      hitStrokeWidth: 20
+
+    this.stage.on('mousemove touchmove', e => {
+      if (!this.isDrawing || e.target !== this.stage) return
+      if (this.center) {
+        if (!this.group.getLayer()) this.layer.add(this.group)
+      } else {
+        if (!this.arc.getLayer()) this.layer.add(this.arc)
+      }
+      const pos = this.stage.getPointerPosition()
+      this.arc.width(pos.y - this.arc.y())
+      this.layer.draw()
     })
-    group.add(arc, centerPoint)
-    return group
+
+    this.stage.on('mouseup touchend', e => {
+      this.isDrawing = false
+    })
   }
 }

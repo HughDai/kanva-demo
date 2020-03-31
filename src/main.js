@@ -8,3 +8,5 @@ export default window.vm = new Vue({
   store,
   render: h => h(App),
 }).$mount('#app')
+
+console.log(window.vm)

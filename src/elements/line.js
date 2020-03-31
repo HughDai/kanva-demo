@@ -42,11 +42,11 @@ export default class Line {
         ...this.options
       })
       this.group.add(this.line)
-      this.layer.add(this.group)
     })
 
     this.stage.on('mousemove touchmove', e => {
       if (!this.isDrawing || e.target !== this.stage) return
+      if (!this.group.getLayer()) this.layer.add(this.group)
       const pos = this.stage.getPointerPosition()
       const newPoints = [
         this.originPosition.x,
