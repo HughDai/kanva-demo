@@ -1,80 +1,18 @@
 /* eslint-disable */ 
 import Konva from 'konva'
+import Graph from './graph'
 import { PolygonSceneFunc } from './util'
 
-const STROKE_COLOR = 'red'
-const STROKE_WIDTH = 1
-const DASH = [10, 5]
-
-const DEFAULT_CONFIG = {
-  dash: DASH,
-  stroke: STROKE_COLOR,
-  strokeWidth: STROKE_WIDTH
-}
-export default class Custom {
-  constructor (options = {}) {
-    const { layer, x, y, ...others } = options
-    this.options = Object.assign(DEFAULT_CONFIG, others)
-    const { strokeWidth, fill } = this.options
-    this.anchorWidth = strokeWidth || STROKE_WIDTH
-    this.anchorFill = fill || STROKE_COLOR
-    this.layer = layer
-    this.stage = this.layer.getStage()
+export default class Custom extends Graph {
+  constructor (options) {
+    super(options)
     this.lastLine = null
     this.lastAnchor = null
-    this.isDrawing = false
     this.anchorPoints = []
     this.callback = function () {}
-    this.init()
   }
 
-  init () {
-    this.stage.on('mousedown touchstart', e => {
-      if (e.target !== this.stage) return
-      this.isDrawing = true
-      const pos = this.stage.getPointerPosition()
-      console.log(pos)
-      this.anchorPoints.push({x: pos.x, y: pos.y})
-      console.log(this.anchorPoints)
-      this.lastAnchor = new Konva.Circle({
-        name: 'customAnchor',
-        x: pos.x,
-        y: pos.y,
-        fill: this.anchorFill,
-        radius: this.anchorWidth * 4
-      })
-      this.lastLine = new Konva.Line({
-        name: 'customLine',
-        stroke: this.options.stroke,
-        strokeWidth: this.options.strokeWidth,
-        points: [pos.x, pos.y],
-        dash: this.options.dash
-      })
-
-      this.layer.add(this.lastAnchor)
-      this.layer.add(this.lastLine)
-    })
-
-    this.stage.on('mousemove touchmove', e => {
-      if (!this.isDrawing || e.target !== this.stage) {
-        return
-      }
-      const pos = this.stage.getPointerPosition()
-      const newPoints = [
-        this.lastAnchor.x(),
-        this.lastAnchor.y(),
-        pos.x,
-        pos.y
-      ]
-      this.lastLine.points(newPoints)
-      console.log(newPoints)
-      this.layer.batchDraw()
-    })
-
-    this.stage.on('mouseup touchend', e => {
-      this.isDrawing = false
-    })
-
+  extendEvents () {
     document.body.addEventListener('keyup', e => {
       console.log(e)
       console.log(this.anchorPoints)
@@ -83,6 +21,97 @@ export default class Custom {
       }
     })
   }
+
+  onStart () {
+    const pos = this.stage.getPointerPosition()
+    this.anchorPoints.push({x: pos.x, y: pos.y})
+    this.lastAnchor = new Konva.Circle({
+      name: 'customAnchor',
+      x: pos.x,
+      y: pos.y,
+      fill: 'red',
+      radius: this.config.strokeWidth * 4
+    })
+    this.lastLine = new Konva.Line({
+      name: 'customLine',
+      stroke: this.config.stroke,
+      strokeWidth: this.config.strokeWidth,
+      points: [pos.x, pos.y],
+      dash: this.config.dash
+    })
+
+    this.layer.add(this.lastAnchor)
+    this.layer.add(this.lastLine)
+  }
+
+  onMove () {
+    const pos = this.stage.getPointerPosition()
+    const newPoints = [
+      this.lastAnchor.x(),
+      this.lastAnchor.y(),
+      pos.x,
+      pos.y
+    ]
+    this.lastLine.points(newPoints)
+    console.log(newPoints)
+    this.layer.batchDraw()
+  }
+
+  // init () {
+  //   this.stage.on('mousedown touchstart', e => {
+  //     if (e.target !== this.stage) return
+  //     this.isDrawing = true
+  //     const pos = this.stage.getPointerPosition()
+  //     console.log(pos)
+  //     this.anchorPoints.push({x: pos.x, y: pos.y})
+  //     console.log(this.anchorPoints)
+  //     this.lastAnchor = new Konva.Circle({
+  //       name: 'customAnchor',
+  //       x: pos.x,
+  //       y: pos.y,
+  //       fill: this.anchorFill,
+  //       radius: this.anchorWidth * 4
+  //     })
+  //     this.lastLine = new Konva.Line({
+  //       name: 'customLine',
+  //       stroke: this.options.stroke,
+  //       strokeWidth: this.options.strokeWidth,
+  //       points: [pos.x, pos.y],
+  //       dash: this.options.dash
+  //     })
+
+  //     this.layer.add(this.lastAnchor)
+  //     this.layer.add(this.lastLine)
+  //   })
+
+  //   this.stage.on('mousemove touchmove', e => {
+  //     if (!this.isDrawing || e.target !== this.stage) {
+  //       return
+  //     }
+  //     const pos = this.stage.getPointerPosition()
+  //     const newPoints = [
+  //       this.lastAnchor.x(),
+  //       this.lastAnchor.y(),
+  //       pos.x,
+  //       pos.y
+  //     ]
+  //     this.lastLine.points(newPoints)
+  //     console.log(newPoints)
+  //     this.layer.batchDraw()
+  //   })
+
+  //   this.stage.on('mouseup touchend', e => {
+  //     this.isDrawing = false
+  //   })
+
+  //   document.body.addEventListener('keyup', e => {
+  //     console.log(e)
+  //     console.log(this.anchorPoints)
+  //     if (e.keyCode === 13 && this.anchorPoints.length > 1) {
+  //       this.draw()
+  //     }
+  //   })
+  // }
 
   draw () {
     const xPoints = this.anchorPoints.map(p => p.x)
@@ -95,7 +124,7 @@ export default class Custom {
       name: 'custom',
       width, height, x, y,
       draggable: true,
-      ...this.options
+      ...this.config
     })
     // wtf 一天
     this.anchorPoints.forEach(p => {

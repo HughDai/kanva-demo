@@ -322,7 +322,7 @@ export default {
     addCenterSemicircle () {
       this.detachDrawEvents()
       this.attachStageEvents()
-      new Semicircle({ layer: this.layer, center: true, ...this.config })
+      new Semicircle({ layer: this.layer, mode: 'center', ...this.config })
     },
     addCircle () {
       this.detachDrawEvents()
@@ -332,7 +332,7 @@ export default {
     addCircleWithCenter () {
       this.detachDrawEvents()
       this.attachStageEvents()
-      new Circle({ layer: this.layer, center: true, ...this.config })
+      new Circle({ layer: this.layer, mode: 'center', ...this.config })
     },
     addStraight () {
       this.detachDrawEvents()

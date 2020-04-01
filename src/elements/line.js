@@ -1,69 +1,48 @@
 /* eslint-disable */ 
 import Konva from 'konva'
+import Graph from './graph'
 
-const STROKE_COLOR = 'red'
-const STROKE_WIDTH = 1
-const DASH = [10, 5]
-const ANCHOR_WIDTH = STROKE_WIDTH * 10
+const ANCHOR_WIDTH = 10
 
-const DEFAULT_CONFIG = {
-  name: 'straightLine',
-  stroke: STROKE_COLOR,
-  strokeWidth: 1,
-  tension: 1,
-  dash: DASH,
-  hitStrokeWidth: 20
-}
-
-export default class Line {
+export default class Line extends Graph {
   constructor (options) {
-    options = options || {}
-    this.instance = null
-    this.options = Object.assign(DEFAULT_CONFIG, options)
-    this.layer = options.layer
-    this.stage = this.layer.getStage()
+    super(options)
+    Object.assign(this.config, {
+      name: 'straightLine',
+      hitStrokeWidth: 20,
+      tension: 1
+    })
     this.group = null
-    this.line = null
-    this.isDrawing = false
-    this.init()
   }
 
-  init () {
+  onStart () {
     this.group = this.createGroup()
-
-    this.stage.on('mousedown touchstart', e => {
-      if (e.target !== this.stage) return
-      this.isDrawing = true
-      const pos = this.stage.getPointerPosition()
-      this.originPosition = pos
-      this.line = new Konva.Line({
-        name: 'straightLine',
-        points: [pos.x, pos.y],
-        ...this.options
-      })
-      this.group.add(this.line)
+    const pos = this.stage.getPointerPosition()
+    this.originPosition = pos
+    this.instance = new Konva.Line({
+      points: [pos.x, pos.y],
+      ...this.config
     })
+    this.group.add(this.instance)
+  }
 
-    this.stage.on('mousemove touchmove', e => {
-      if (!this.isDrawing || e.target !== this.stage) return
-      if (!this.group.getLayer()) this.layer.add(this.group)
-      const pos = this.stage.getPointerPosition()
-      const newPoints = [
-        this.originPosition.x,
-        this.originPosition.y,
-        pos.x,
-        pos.y
-      ]
-      console.log(newPoints)
-      this.line.points(newPoints)
-      this.layer.batchDraw()
-    })
+  onMove () {
+    if (!this.group.getLayer()) this.layer.add(this.group)
+    const pos = this.stage.getPointerPosition()
+    const newPoints = [
+      this.originPosition.x,
+      this.originPosition.y,
+      pos.x,
+      pos.y
+    ]
+    console.log(newPoints)
+    this.instance.points(newPoints)
+    this.layer.batchDraw()
+  }
 
-    this.stage.on('mouseup touchend', e => {
-      this.isDrawing = false
-      this.line = null
-      this.group = this.createGroup()
-    })
+  onEnd () {
+    this.instance = null
+    this.group = this.createGroup()
   }
 
   createGroup () {

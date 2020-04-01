@@ -1,81 +1,53 @@
 /* eslint-disable */ 
 import Konva from 'konva'
+import Graph from './graph'
 
-const STROKE_COLOR = 'red'
-const STROKE_WIDTH = 1
-const DASH = [10, 5]
-
-const DEFAULT_CONFIG = {
-  innerRadius: 0,
-  outerRadius: 100,
-  angle: 180,
-  rotation: 180,
-  dash: DASH,
-  fill: '',
-  stroke: STROKE_COLOR,
-  strokeWidth: STROKE_WIDTH,
-  draggable: true
-}
-
-export default class Semicircle {
+export default class Semicircle extends Graph {
   constructor (options) {
-    options = options || {}
-    const { layer, center, ...others } = options
-    this.layer = layer
-    this.stage = layer.getStage()
-    this.center = !!center
-    this.arc = null
-    this.circleCenter = null
+    super(options)
     this.group = null
-    this.isDrawing = false
-    this.options = Object.assign(DEFAULT_CONFIG, options)
-    this.init()
+    Object.assign(this.config, {
+      innerRadius: 0,
+      outerRadius: 100,
+      angle: 180,
+      rotation: 180
+    })
   }
 
-  init () {
-    this.stage.on('mousedown touchstart', e => {
-      if (e.target !== this.stage) return
-      this.isDrawing = true
-      const pos = this.stage.getPointerPosition()
-      this.arc = new Konva.Arc({
+  onStart () {
+    const pos = this.stage.getPointerPosition()
+    this.instance = new Konva.Arc({
+      x: pos.x,
+      y: pos.y,
+      ...this.config
+    })
+    if (this.mode === 'center') {
+      this.group = new Konva.Group({
+        draggable: true,
+        hitStrokeWidth: 20
+      })
+      this.circleCenter = new Konva.Circle({
+        name: 'circleCenter',
         x: pos.x,
         y: pos.y,
-        ...this.options
+        radius: this.config.strokeWidth * 4,
+        fill: 'black',
+        draggable: false
       })
-      if (this.center) {
-        this.group = new Konva.Group({
-          draggable: true,
-          hitStrokeWidth: 20
-        })
-        this.circleCenter = new Konva.Circle({
-          name: 'circleCenter',
-          x: pos.x,
-          y: pos.y,
-          radius: STROKE_WIDTH * 4,
-          fill: 'black',
-          draggable: false
-        })
-        this.arc.name('circleWithCenter')
-        this.arc.draggable(false)
-        this.group.add(this.arc, this.circleCenter)
-        console.log(this.group.getLayer())
-      } 
-    })
+      this.instance.name('circleWithCenter')
+      this.instance.draggable(false)
+      this.group.add(this.instance, this.circleCenter)
+    }
+  }
 
-    this.stage.on('mousemove touchmove', e => {
-      if (!this.isDrawing || e.target !== this.stage) return
-      if (this.center) {
-        if (!this.group.getLayer()) this.layer.add(this.group)
-      } else {
-        if (!this.arc.getLayer()) this.layer.add(this.arc)
-      }
-      const pos = this.stage.getPointerPosition()
-      this.arc.width(pos.y - this.arc.y())
-      this.layer.draw()
-    })
-
-    this.stage.on('mouseup touchend', e => {
-      this.isDrawing = false
-    })
+  onMove () {
+    if (this.mode === 'center') {
+      if (!this.group.getLayer()) this.layer.add(this.group)
+    } else {
+      if (!this.instance.getLayer()) this.layer.add(this.instance)
+    }
+    const pos = this.stage.getPointerPosition()
+    this.instance.width(pos.y - this.instance.y())
+    this.layer.draw()
   }
 }

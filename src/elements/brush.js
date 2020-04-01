@@ -1,59 +1,33 @@
 /* eslint-disable */ 
 import Konva from 'konva'
+import Graph from './graph'
 
-const STROKE_COLOR = 'red'
-const STROKE_WIDTH = 1
-const DASH = [10, 5]
-const ANCHOR_WIDTH = STROKE_WIDTH * 10
-
-const DEFAULT_CONFIG = {
-  name: 'straightLine',
-  stroke: STROKE_COLOR,
-  strokeWidth: 1,
-  tension: 1,
-  dash: DASH,
-  hitStrokeWidth: 20
-}
-
-export default class Line {
+export default class Line extends Graph {
   constructor (options) {
-    options = options || {}
-    this.instance = null
-    const { mode, layer, x, y, ...others } = options
-    this.mode = mode || 'brush'
-    this.options = Object.assign(DEFAULT_CONFIG, others)
-    this.layer = layer
-    this.stage = layer.getStage()
-    this.line = null
-    this.isDrawing = false
-    this.init()
+    super(options)
+    Object.assign(this.config, {
+      tension: 1,
+      hitStrokeWidth: 20,
+    })
   }
 
-  init () {
-    this.stage.on('mousedown touchstart', () => {
-      this.isDrawing = true
-      const pos = this.stage.getPointerPosition()
-      console.log(pos)
-      this.line = new Konva.Line({
-        name: 'line',
-        ...this.options,
-        globalCompositeOperation: this.mode === 'brush' ? 'source-over' : 'destination-out',
-        points: [pos.x, pos.y]
-      })
+  onStart () {
+    const pos = this.stage.getPointerPosition()
+    this.instance = new Konva.Line({
+      name: 'line',
+      ...this.config,
+      points: [pos.x, pos.y],
+      globalCompositeOperation: this.mode === 'brush'
+        ? 'source-over'
+        : 'destination-out'
     })
+  }
 
-    this.stage.on('mousemove touchmove', () => {
-      if (!this.isDrawing) return
-      if (!this.line.getLayer()) this.layer.add(this.line)
-      const pos = this.stage.getPointerPosition()
-      var newPoints = this.line.points().concat([pos.x, pos.y])
-      this.line.points(newPoints)
-      console.log(newPoints)
-      this.layer.batchDraw()
-    })
-
-    this.stage.on('mouseup touchend', () => {
-      this.isDrawing = false
-    })
+  onMove () {
+    if (!this.instance.getLayer()) this.layer.add(this.instance)
+    const pos = this.stage.getPointerPosition()
+    var newPoints = this.instance.points().concat([pos.x, pos.y])
+    this.instance.points(newPoints)
+    this.layer.batchDraw()
   }
 }

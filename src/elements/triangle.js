@@ -1,69 +1,42 @@
 /* eslint-disable */ 
 import Konva from 'konva'
+import Graph from './graph'
 import { TriangleSceneFunc } from './util'
 
-const STROKE_COLOR = 'red'
-const STROKE_WIDTH = 1
-const DASH = [10, 5]
-
-const DEFAULT_CONFIG = {
-  dash: DASH,
-  stroke: STROKE_COLOR,
-  strokeWidth: STROKE_WIDTH,
-  draggable: true
-}
-
-export default class Triangle {
+export default class Triangle extends Graph {
   constructor (options) {
-    options = options || {}
-    const { layer, ...others } = options
-    this.layer = layer
-    this.stage = layer.getStage()
-    this.triangle = null
-    this.isDrawing = false
-    this.options = Object.assign(DEFAULT_CONFIG, options)
-    this.init()
+    super(options)
   }
 
-  init () {
-    this.stage.on('mousedown touchstart', e => {
-      if (e.target !== this.stage) return
-      this.isDrawing = true
-      const pos = this.stage.getPointerPosition()
-      this.triangle = this.create()
-      this.triangle.position(pos)
-    })
+  onStart () {
+    const pos = this.stage.getPointerPosition()
+    this.instance = this.create()
+    this.instance.position(pos)
+  }
 
-    this.stage.on('mousemove touchmove', e => {
-      if (!this.isDrawing || e.target !== this.stage) return
-      if (!this.triangle.getLayer()) this.layer.add(this.triangle)
-      let size = this.calcSize()
-      this.triangle.size(size)
-      this.layer.draw()
-    })
-
-    this.stage.on('mouseup touchend', e => {
-      this.isDrawing = false
-    })
+  onMove () {
+    if (!this.instance.getLayer()) this.layer.add(this.instance)
+    let size = this.calcSize()
+    this.instance.size(size)
+    this.layer.draw()
   }
 
   calcSize () {
-    const mode = this.options.mode || 'equilateral'
+    this.mode = this.mode || 'equilateral'
     const pos = this.stage.getPointerPosition()
-    const { x, y } = this.triangle.position()
+    const { x, y } = this.instance.position()
     const height = pos.y - y
     let width = height
-    if (mode === 'equilateral') {
+    if (this.mode === 'equilateral') {
       width = width = Math.tan(30 * Math.PI / 180) * height * 2
     }
     return { width, height }
   }
 
   create () {
-    const mode = this.options.mode || 'equilateral'
-    console.log(mode)
+    this.mode = this.mode || 'equilateral'
     let shape = null
-    switch (mode) {
+    switch (this.mode) {
       case 'right':
         shape = this.drawRight()
         break
@@ -78,8 +51,8 @@ export default class Triangle {
   }
 
   drawRight () {
-    this.options.name = 'right'
-    const shape = new Konva.Shape(this.options)
+    this.config.name = 'right'
+    const shape = new Konva.Shape(this.config)
     shape.sceneFunc((context, shape) => {
       TriangleSceneFunc.right(context, shape)
     })
@@ -88,8 +61,8 @@ export default class Triangle {
   }
 
   drawEquilateral () {
-    this.options.name = 'equilateral'
-    const shape = new Konva.Shape(this.options)
+    this.config.name = 'equilateral'
+    const shape = new Konva.Shape(this.config)
     shape.sceneFunc((context, shape) => {
       TriangleSceneFunc.equilateral(context, shape)
     })
@@ -97,8 +70,8 @@ export default class Triangle {
   }
 
   drawIsosceles () {
-    this.options.name = 'isosceles'
-    const shape = new Konva.Shape(this.options)
+    this.config.name = 'isosceles'
+    const shape = new Konva.Shape(this.config)
     shape.sceneFunc((context, shape) => {
       TriangleSceneFunc.isosceles(context, shape)
     })
