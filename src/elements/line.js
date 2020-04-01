@@ -10,7 +10,8 @@ export default class Line extends Graph {
     Object.assign(this.config, {
       name: 'straightLine',
       hitStrokeWidth: 20,
-      tension: 1
+      tension: 1,
+      draggable: false
     })
     this.group = null
   }

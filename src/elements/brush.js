@@ -8,6 +8,7 @@ export default class Line extends Graph {
     Object.assign(this.config, {
       tension: 1,
       hitStrokeWidth: 20,
+      draggable: false
     })
   }
 
