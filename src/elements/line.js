@@ -7,6 +7,7 @@ const ANCHOR_WIDTH = 10
 export default class Line extends Graph {
   constructor (options) {
     super(options)
+    this.name = 'line'
     Object.assign(this.config, {
       name: 'straightLine',
       hitStrokeWidth: 20,
@@ -14,6 +15,7 @@ export default class Line extends Graph {
       draggable: false
     })
     this.group = null
+    this.init()
   }
 
   onStart () {

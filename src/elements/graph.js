@@ -11,15 +11,12 @@ export default class Graph {
   constructor (options) {
     options = options || {}
     const { layer, mode, ...others } = options
-    
     this.layer = layer
     this.stage = layer.getStage()
     this.instance = null
     this.mode = mode
     this.isDrawing = null
-    
     this.config = Object.assign(DEFAULT_CONFIG, others)
-    this.init()
   }
 
   init () {

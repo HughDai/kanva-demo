@@ -5,11 +5,15 @@ import Graph from './graph'
 export default class Line extends Graph {
   constructor (options) {
     super(options)
+    this.name = 'brush'
     Object.assign(this.config, {
       tension: 1,
-      hitStrokeWidth: 20,
+      strokeWidth: 4,
+      lineCap: 'round',
+      lineJoin: 'round',
       draggable: false
     })
+    this.init()
   }
 
   onStart () {

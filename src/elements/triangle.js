@@ -6,6 +6,8 @@ import { TriangleSceneFunc } from './util'
 export default class Triangle extends Graph {
   constructor (options) {
     super(options)
+    this.name = 'triangle'
+    this.init()
   }
 
   onStart () {

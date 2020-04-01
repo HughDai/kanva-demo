@@ -6,10 +6,12 @@ import { PolygonSceneFunc } from './util'
 export default class Custom extends Graph {
   constructor (options) {
     super(options)
+    this.name = 'custom'
     this.lastLine = null
     this.lastAnchor = null
     this.anchorPoints = []
     this.callback = function () {}
+    this.init()
   }
 
   extendEvents () {
@@ -57,62 +59,6 @@ export default class Custom extends Graph {
     this.layer.batchDraw()
   }
 
-  // init () {
-  //   this.stage.on('mousedown touchstart', e => {
-  //     if (e.target !== this.stage) return
-  //     this.isDrawing = true
-  //     const pos = this.stage.getPointerPosition()
-  //     console.log(pos)
-  //     this.anchorPoints.push({x: pos.x, y: pos.y})
-  //     console.log(this.anchorPoints)
-  //     this.lastAnchor = new Konva.Circle({
-  //       name: 'customAnchor',
-  //       x: pos.x,
-  //       y: pos.y,
-  //       fill: this.anchorFill,
-  //       radius: this.anchorWidth * 4
-  //     })
-  //     this.lastLine = new Konva.Line({
-  //       name: 'customLine',
-  //       stroke: this.options.stroke,
-  //       strokeWidth: this.options.strokeWidth,
-  //       points: [pos.x, pos.y],
-  //       dash: this.options.dash
-  //     })
-
-  //     this.layer.add(this.lastAnchor)
-  //     this.layer.add(this.lastLine)
-  //   })
-
-  //   this.stage.on('mousemove touchmove', e => {
-  //     if (!this.isDrawing || e.target !== this.stage) {
-  //       return
-  //     }
-  //     const pos = this.stage.getPointerPosition()
-  //     const newPoints = [
-  //       this.lastAnchor.x(),
-  //       this.lastAnchor.y(),
-  //       pos.x,
-  //       pos.y
-  //     ]
-  //     this.lastLine.points(newPoints)
-  //     console.log(newPoints)
-  //     this.layer.batchDraw()
-  //   })
-
-  //   this.stage.on('mouseup touchend', e => {
-  //     this.isDrawing = false
-  //   })
-
-  //   document.body.addEventListener('keyup', e => {
-  //     console.log(e)
-  //     console.log(this.anchorPoints)
-  //     if (e.keyCode === 13 && this.anchorPoints.length > 1) {
-  //       this.draw()
-  //     }
-  //   })
-  // }
-
   draw () {
     const xPoints = this.anchorPoints.map(p => p.x)
     const yPoints = this.anchorPoints.map(p => p.y)
@@ -135,8 +81,6 @@ export default class Custom extends Graph {
     shape.sceneFunc((context, shape) => {
       PolygonSceneFunc.custom(context, shape)
     })
-
-    console.log(shape.toDataURL())
     
     this.layer.find('.customAnchor, .customLine').destroy()
 

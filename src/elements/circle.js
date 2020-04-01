@@ -5,7 +5,9 @@ import Graph from './graph'
 export default class Circle extends Graph {
   constructor (options) {
     super(options)
+    this.name = 'circle'
     this.group = null
+    this.init()
   }
 
   onStart () {

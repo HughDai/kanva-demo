@@ -6,7 +6,9 @@ import { RectSceneFunc } from './util'
 export default class Rect extends Graph {
   constructor (options) {
     super(options)
+    this.name = 'rect'
     this.mode = this.mode || 'square'
+    this.init()
   }
 
   onStart () {

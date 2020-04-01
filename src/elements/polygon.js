@@ -5,7 +5,9 @@ import Graph from './graph'
 export default class Polygon extends Graph {
   constructor (options) {
     super(options)
+    this.name = 'polygon'
     this.sides = options.sides || 5
+    this.init()
   }
 
   onStart () {

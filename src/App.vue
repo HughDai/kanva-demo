@@ -31,7 +31,6 @@
     <button @click="clear">清屏</button>
     <button @click="undo">撤销</button>
     <button @click="redo">重做</button>
-    &nbsp;&nbsp;&nbsp;&nbsp;
     <label>填充</label>
     <select @change="handleFillChange">
       <option value="">空心</option>
@@ -54,6 +53,9 @@
     </select>
     <div id="toolbar-wrapper">
       <toolbar></toolbar>
+    </div>
+    <div class="bg">
+      <button>test124344234234</button>
     </div>
     <div id="container"></div>
     <div id="preview"></div>
@@ -404,7 +406,9 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+@import '~@/assets/styles/reset.scss';
+
 #app {
   position: relative;
   width: 1000px;
@@ -414,6 +418,12 @@ export default {
   /* position: absolute;
   left: 0;
   top: 0; */
+}
+.bg {
+  position: absolute;
+  width: 100%;
+  height: 500px;
+  border: 1px solid black;
 }
 #container {
   width: 100%;

@@ -5,6 +5,7 @@ import Graph from './graph'
 export default class Semicircle extends Graph {
   constructor (options) {
     super(options)
+    this.name = 'semicircle'
     this.group = null
     Object.assign(this.config, {
       innerRadius: 0,
@@ -12,6 +13,7 @@ export default class Semicircle extends Graph {
       angle: 180,
       rotation: 180
     })
+    this.init()
   }
 
   onStart () {
