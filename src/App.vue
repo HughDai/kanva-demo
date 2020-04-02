@@ -22,7 +22,6 @@
     <button @click="addCircleWithCenter">圆心圆</button>
     <button @click="addSemicircle">半圆</button>
     <button @click="addCenterSemicircle">圆心半圆</button>
-    <br>
     <button @click="draw('brush')">画笔</button>
     <button @click="draw('eraser')">橡皮</button>
     <button @click="handleModeChange">{{isBrushMode ? '退出画笔' : '画笔模式'}}</button>
@@ -51,6 +50,7 @@
       <option value="1">1</option>
       <option value="2">2</option>
     </select>
+    <br><br><br>
     <div id="toolbar-wrapper">
       <toolbar></toolbar>
     </div>
