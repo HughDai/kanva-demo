@@ -426,7 +426,8 @@ export default {
   border: 1px solid black;
 }
 #container {
-  width: 100%;
+  width: 800px;
+  height: 600px;
   border: 1px solid red;
 }
 #preview {

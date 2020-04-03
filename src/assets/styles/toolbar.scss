@@ -34,18 +34,19 @@ $line-styles: (dash, solid);
   height: 40px;
   background: $bg-color;
   padding: 0 6px;
+  cursor: pointer;
   aside {
     display: flex;
   }
 }
-.left-side {}
+.lkt-tools {}
 
-.middle-side {
+.kt-settings {
   flex: 1;
   display: flex;
 }
 
-.right-side {}
+.kt-operations {}
 
 .#{$scope}selector-list {
   overflow: hidden;
@@ -217,11 +218,11 @@ $line-styles: (dash, solid);
   background: url("~@/assets/images/icon-separator.png") center no-repeat;
   background-size: 100% 24px;
 }
-.left-side .#{$scope}separator {
+.kt-tools .#{$scope}separator {
   margin-left: 6px;
   margin-right: 12px;
 }
-.right-side .#{$scope}separator {
+.kt-operations .#{$scope}separator {
   &:last-of-type {
     margin-left: 6px;
   }
@@ -260,7 +261,7 @@ $line-styles: (dash, solid);
     @include hlw;
   }
 }
-.popper-graph, .popper-sw, .popper-line {
+.popper-graph, .popper-sw, .popper-line, .popper-countdown {
   padding: 0 6px;
   li {
     width: 28px;
@@ -272,10 +273,9 @@ $line-styles: (dash, solid);
   }
 }
 .popper-countdown {
-  width: 112px;
   font-size: 11px;
   color: #ffffff;
-  justify-content: space-around;
+  line-height: 28px;
 }
 /* popper style end */
 
