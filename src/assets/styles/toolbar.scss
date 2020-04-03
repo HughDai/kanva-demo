@@ -29,12 +29,15 @@ $sizes: (small, medium, large);
 $line-styles: (dash, solid);
 
 .#{$scope}container {
+  position: relative;
+  cursor: pointer;
+}
+.#{$scope}main {
   display: flex;
+  background: $bg-color;
   width: 100%;
   height: 40px;
-  background: $bg-color;
   padding: 0 6px;
-  cursor: pointer;
   aside {
     display: flex;
   }
@@ -246,6 +249,21 @@ $line-styles: (dash, solid);
       border-radius: 0 2px 2px 0;
       background-image: url("~@/assets/images/icon-arrow-up.png");
     }
+  }
+}
+
+.#{$scope}arrow {
+  display: block;
+  width: 32px;
+  height: 24px;
+  position: absolute;
+  left: 0;
+  top: -24px;
+  &-expand {
+    background: url("~@/assets/images/arrow-expand.png") no-repeat center/100% auto;
+  }
+  &-collapse {
+    background: url("~@/assets/images/arrow-collapse.png") no-repeat center/100% auto;
   }
 }
 /* arrow style end */
