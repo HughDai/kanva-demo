@@ -1,0 +1,294 @@
+$scope: kt- !default;
+$bg-color: #4C4B4E;
+
+@mixin hlw {
+  border-radius: 2px;
+  background-color: rgba(255, 255, 255, .3);
+}
+@mixin hlb {
+  background-color: rgba(0, 0, 0, .3);
+}
+@mixin checked {
+  border: 1px solid rgba(255, 255, 255, .15);
+  border-right: 0;
+  border-radius: 2px 0 0 2px;
+}
+$selector-icons: (
+  mouse, brush, eraser, line, square, whiteboard,
+  remove, clear, undo, redo, reset, countdown
+);
+$graph-icons: (
+  equilateral, right, isosceles, square, rectangle,
+  rhombus, trapezoid, circle, semicircle, custom
+);
+$colors: (
+  blank, black, blue, red, white,yellow, lightblue
+);
+$boards: (white, black, english);
+$sizes: (small, medium, large);
+$line-styles: (dash, solid);
+
+.#{$scope}container {
+  display: flex;
+  width: 100%;
+  height: 40px;
+  background: $bg-color;
+  padding: 0 6px;
+  aside {
+    display: flex;
+  }
+}
+.left-side {}
+
+.middle-side {
+  flex: 1;
+  display: flex;
+}
+
+.right-side {}
+
+.#{$scope}selector-list {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+.#{$scope}selector {
+  width: 28px;
+  height: 28px;
+  & ~ li{
+    margin-left: 2px;
+  }
+}
+
+.stroke-width-picker,
+.line-style-picker,
+.eraser-width-picker,
+.stroke-color-picker,
+.board-style-picker,
+.graph-style-picker {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+}
+.board-style-picker {
+  li ~ li {
+    margin-left: 8px;
+  }
+}
+.graph-style-picker {
+  li:first-child {
+    margin-right: 4px;
+  }
+}
+.eraser-width-picker {
+  li {
+    width: 28px;
+    height: 28px;
+    margin-right: 2px;
+    &:last-child {
+      margin-right: 0;
+    }
+    &:hover {
+      @include hlw;
+    }
+  }
+}
+
+/* icon style start */
+@for $i from 1 through length($selector-icons) {
+  $icon: nth($selector-icons, $i);
+  @if $i != 5 {
+    .#{$scope}icon-#{$icon} {
+      background: url("~@/assets/images/icon-#{$icon}.png") center no-repeat;
+      background-size: 100% auto;
+      &:hover {
+        @include hlw;
+      }
+    }
+  }
+}
+
+@each $icon in $sizes {
+  .#{$scope}icon-sw-#{$icon} {
+    width: 28px;
+    height: 28px;
+    background: url("~@/assets/images/icon-sw-#{$icon}.png") center no-repeat;
+    background-size: 100% auto;
+    &:hover {
+      @include hlw;
+    }
+  }
+  .#{$scope}icon-eraser-#{$icon} {
+    width: 28px;
+    height: 28px;
+    background: url("~@/assets/images/icon-eraser-#{$icon}.png") center no-repeat;
+    background-size: 100% auto;
+    &:hover {
+      @include hlw;
+    }
+  }
+}
+
+@for $i from 1 through length($graph-icons) {
+  $icon: nth($graph-icons, $i);
+  .#{$scope}icon-#{$icon} {
+    background: url("~@/assets/images/icon-#{$icon}.png") center no-repeat;
+    background-size: 100% auto;
+    &:hover {
+      @include hlw;
+    }
+  }
+}
+
+.graph-checked {
+  @include hlb;
+  @include checked;
+}
+
+@each $icon in $line-styles {
+  .#{$scope}icon-line-#{$icon} {
+    width: 28px;
+    height: 28px;
+    background: url("~@/assets/images/icon-line-#{$icon}.png") center no-repeat;
+    background-size: 100% auto;
+    &:hover {
+      @include hlw;
+    }
+  }
+}
+
+.line-checked {
+  width: 30px;
+  height: 18px;
+  @include hlb;
+  @include checked;
+}
+
+@each $color in $colors {
+  .#{$scope}icon-color-#{$color} {
+    width: 24px;
+    height: 24px;
+    background: url("~@/assets/images/icon-color-#{$color}.png") center no-repeat;
+    background-size: 100% auto;
+    &-hl {
+      width: 24px;
+      height: 24px;
+      background: url("~@/assets/images/icon-checked.png") no-repeat right bottom/12px,
+                  url("~@/assets/images/icon-color-#{$color}.png") no-repeat center/24px,
+    }
+  }
+  .#{$scope}icon-fill-#{$color} {
+    width: 28px;
+    height: 28px;
+    background: url("~@/assets/images/icon-fill-#{$color}.png") center no-repeat;
+    background-size: 100% auto;
+  }
+  .#{$scope}icon-stroke-#{$color} {
+    width: 28px;
+    height: 28px;
+    background: url("~@/assets/images/icon-stroke-#{$color}.png") center no-repeat;
+    background-size: 100% auto;
+  }
+}
+
+@each $board in $boards {
+  .#{$scope}icon-board-#{$board} {
+    width: 28px;
+    height: 28px;
+    background: url("~@/assets/images/icon-board-#{$board}.png") center no-repeat;
+    background-size: 100% auto;
+    &:hover {
+      @include hlw;
+    }
+  }
+  .#{$scope}board-#{$board} {
+    width: 100%;
+    height: 100%;
+    background: url("~@/assets/images/board-#{$board}.png") center no-repeat;
+    background-size: cover;
+  }
+}
+
+/* icon style end */
+
+.#{$scope}separator {
+  width: 8px;
+  height: 100%;
+  background: url("~@/assets/images/icon-separator.png") center no-repeat;
+  background-size: 100% 24px;
+}
+.left-side .#{$scope}separator {
+  margin-left: 6px;
+  margin-right: 12px;
+}
+.right-side .#{$scope}separator {
+  &:last-of-type {
+    margin-left: 6px;
+  }
+  margin-right: 6px;
+}
+
+/* arrow style start */
+@each $height in 28, 18 {
+  .#{$scope}icon-arrow-#{$height} {
+    position: relative;
+    display: block;
+    width: 16px;
+    height: #{$height}px;
+    background: url("~@/assets/images/icon-arrow-down.png") center no-repeat;
+    background-size: 9px 8px;
+    border: 1px solid rgba(255, 255, 255, .15);
+    border-radius: 0 2px 2px 0;
+    @include hlb;
+    &:hover {
+      @include hlw;
+      border-radius: 0 2px 2px 0;
+      background-image: url("~@/assets/images/icon-arrow-up.png");
+    }
+  }
+}
+/* arrow style end */
+
+/* popper style start */
+.popper-content {
+  display: flex;
+  height: 40px;
+  background: $bg-color;
+  align-items: center;
+  border-radius: 4px;
+  li:hover {
+    @include hlw;
+  }
+}
+.popper-graph, .popper-sw, .popper-line {
+  padding: 0 6px;
+  li {
+    width: 28px;
+    height: 28px;
+    margin-right: 6px;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+.popper-countdown {
+  width: 112px;
+  font-size: 11px;
+  color: #ffffff;
+  justify-content: space-around;
+}
+/* popper style end */
+
+.#{scope}hl {
+  @include hlw;
+}
+
+.#{scope}icon-checked {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  background: url("~@/assets/images/icon-checked.png") center no-repeat;
+  background-size: 100% auto;
+}
