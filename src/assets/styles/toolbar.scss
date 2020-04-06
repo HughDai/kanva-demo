@@ -42,7 +42,7 @@ $line-styles: (dash, solid);
     display: flex;
   }
 }
-.lkt-tools {}
+.kt-tools {}
 
 .kt-settings {
   flex: 1;
@@ -174,6 +174,9 @@ $line-styles: (dash, solid);
     height: 24px;
     background: url("~@/assets/images/icon-color-#{$color}.png") center no-repeat;
     background-size: 100% auto;
+    &:hover {
+      @include hlw;
+    }
     &-hl {
       width: 24px;
       height: 24px;
@@ -192,6 +195,9 @@ $line-styles: (dash, solid);
     height: 28px;
     background: url("~@/assets/images/icon-stroke-#{$color}.png") center no-repeat;
     background-size: 100% auto;
+    &:hover {
+      @include hlw;
+    }
   }
 }
 
@@ -297,11 +303,11 @@ $line-styles: (dash, solid);
 }
 /* popper style end */
 
-.#{scope}hl {
+.#{$scope}hl {
   @include hlw;
 }
 
-.#{scope}icon-checked {
+.#{$scope}icon-checked {
   position: absolute;
   right: 0;
   bottom: 0;

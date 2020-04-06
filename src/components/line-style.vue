@@ -1,9 +1,11 @@
 <template>
   <div class="line-style-picker">
-    <div class="kt-icon-line-solid line-checked"></div>
+    <div :class="['kt-icon-line-' + value, 'line-checked']"></div>
     <popper offset="0,11px">
       <ul slot="content" class="popper-content popper-line">
-        <li v-for="i in ['dash', 'solid']" :key="i" :class="'kt-icon-line-'+ i"></li>
+        <li v-for="i in options" :key="i"
+        :class="['kt-icon-line-'+ i, {'kt-hl': value === i}]"
+        @click="onClick(i)"></li>
       </ul>
       <a class="kt-icon-arrow-18" slot="reference"></a>
     </popper>
@@ -17,6 +19,20 @@ export default {
   name: 'LineStyle',
   components: {
     popper
+  },
+  data () {
+    return {
+      value: 'solid',
+      options: ['dash', 'solid']
+    }
+  },
+  methods: {
+    onClick (val) {
+      this.value = val
+      this.$emit('change', val)
+      // todo change settings
+      // this.$store.CHANGE_SETTINGS({ key: 'lineStyle', value: val })
+    }
   }
 }
 </script>
