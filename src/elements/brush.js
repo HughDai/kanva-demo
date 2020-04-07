@@ -8,7 +8,6 @@ export default class Line extends Graph {
     this.name = 'brush'
     Object.assign(this.config, {
       tension: 1,
-      strokeWidth: 4,
       lineCap: 'round',
       lineJoin: 'round',
       draggable: false

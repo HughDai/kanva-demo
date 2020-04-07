@@ -1,7 +1,13 @@
 export default {
-  config: {},
-  // 画布json
-  stageHistory: [],
-  // 存储步骤下标
-  stageHistoryStep: 0
+  currentMode: 'mouse',
+  graphStyleMode: 'stroke',
+  selectedGraph: 'square',
+  graphClass: 'Rect',
+  lineStyle: 'solid',
+  currentColor: 'red',
+  eraserWidth: 'medium',
+  stroke: '',
+  strokeWidth: 'medium',
+  fill: '',
+  dashEnabled: false
 }

@@ -21,9 +21,8 @@ export default {
     }
   },
   methods: {
-    onClick (item) {
-      this.$emit('change', item)
-      // this.$store.CHANGE_SETTINGS({ key: 'eraserWidth', value: val })
+    onClick (val) {
+      this.$store.commit('CHANGE_STATE', { eraserWidth: val })
     }
   }
 }

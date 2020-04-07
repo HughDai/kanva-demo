@@ -40,24 +40,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.popper {
-  background-color: #4C4B4E;
-  padding: 0;
-  box-shadow: none;
-  border: none;
-}
-.popper[x-placement^="top"] .popper__arrow {
-  border-color: #4C4B4E transparent transparent transparent;
-}
-.popper[x-placement^="right"] .popper__arrow {
-  border-color: transparent #4C4B4E transparent transparent;
-}
-.popper[x-placement^="bottom"] .popper__arrow {
-  border-color: transparent transparent #4C4B4E transparent;
-}
-.popper[x-placement^="left"] .popper__arrow {
-  border-color: transparent transparent transparent #4C4B4E;
-}
-</style>

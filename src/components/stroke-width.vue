@@ -29,9 +29,7 @@ export default {
   methods: {
     onClick (val) {
       this.value = val
-      this.$emit('change', val)
-      // todo change settings
-      // this.$store.CHANGE_SETTINGS({ key: 'strokeWidth', value: val })
+      this.$store.commit('CHANGE_STATE', { strokeWidth: val })
     }
   }
 }

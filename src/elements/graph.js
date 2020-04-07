@@ -1,11 +1,11 @@
-const DEFAULT_CONFIG = {
-  fill: 'red',
-  stroke: 'red',
-  strokeWidth: 1,
-  dashEnabled: false,
-  dash: [10, 5],
-  draggable: true
-}
+// const DEFAULT_CONFIG = {
+//   fill: 'red',
+//   stroke: 'red',
+//   strokeWidth: 1,
+//   dashEnabled: false,
+//   dash: [10, 5],
+//   draggable: true
+// }
 
 export default class Graph {
   constructor (options) {
@@ -16,7 +16,9 @@ export default class Graph {
     this.instance = null
     this.mode = mode
     this.isDrawing = null
-    this.config = Object.assign(DEFAULT_CONFIG, others)
+    this.config = others
+    this.config.draggable = true
+    if (this.config.dashEnabled) this.config.dash = [10, 5]
   }
 
   init () {
@@ -37,6 +39,10 @@ export default class Graph {
     })
 
     this.extendEvents()
+  }
+
+  getInstance () {
+    return this.instance
   }
 
   onStart () {}

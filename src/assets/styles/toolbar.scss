@@ -34,8 +34,9 @@ $line-styles: (dash, solid);
 }
 .#{$scope}main {
   display: flex;
+  justify-content: space-between;
   background: $bg-color;
-  width: 100%;
+  width: 800px;
   height: 40px;
   padding: 0 6px;
   aside {
@@ -315,4 +316,30 @@ $line-styles: (dash, solid);
   height: 12px;
   background: url("~@/assets/images/icon-checked.png") center no-repeat;
   background-size: 100% auto;
+}
+
+.board-pagination {
+  display: flex;
+  position: absolute;
+  left: 50px;
+  top: -38px;
+  li {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    color: #ffffff;
+    border-radius: 2px;
+    background:rgba(0,0,0,0.5);
+    text-align: center;
+    line-height: 20px;
+    &:hover {
+      background: rgba(3,120,225,1);
+    }
+    & ~ li {
+      margin-left: 10px;
+    }
+  }
+  .hl {
+    background: rgba(3,120,225,1);
+  }
 }

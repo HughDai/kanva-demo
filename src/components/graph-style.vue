@@ -2,8 +2,8 @@
   <div class="graph-style-picker">
     <div :class="['kt-icon-fill-' + fill, {'kt-hl': mode === 'fill'}]"
     @click="changeMode('fill')"></div>
-    <div :class="['kt-icon-stroke-' + strokeColor, {'kt-hl': mode === 'strokeColor'}]"
-    @click="changeMode('strokeColor')"></div>
+    <div :class="['kt-icon-stroke-' + stroke, {'kt-hl': mode === 'stroke'}]"
+    @click="changeMode('stroke')"></div>
   </div>
 </template>
 
@@ -11,25 +11,22 @@
 export default {
   name: 'GraphStyle',
   props: {
-    fill: {
+    mode: {
       type: String,
-      default: 'blank'
+      default: 'stroke'
     },
-    strokeColor: {
-      type: String,
-      default: 'red'
-    }
+    fill: String,
+    stroke: String
   },
   data () {
     return {
-      mode: 'strokeColor',
       colors: [ 'blank', 'black', 'blue', 'red', 'white', 'yellow', 'lightblue']
     }
   },
   methods: {
-    changeMode (mode) {
-      this.mode = mode
-      // this.$store.CHANGE_SETTINGS({ key: this.mode, value: val })
+    changeMode (val) {
+      let currentColor = val === 'fill' ? this.fill : this.stroke
+      this.$store.commit('CHANGE_STATE', { graphStyleMode: val, currentColor })
     }
   }
 }

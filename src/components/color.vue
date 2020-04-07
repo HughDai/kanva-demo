@@ -1,8 +1,13 @@
 <template>
   <ul class="stroke-color-picker">
-    <li v-for="i in colors" :key="i"
-    :class="['kt-icon-color-' + i + (value === i ? '-hl' : '')]"
-    @click="onClick(i)"></li>
+    <template v-for="i in colors">
+      <li :key="i" v-if="i !== 'blank'"
+      :class="['kt-icon-color-' + i + (value === i ? '-hl' : '')]"
+      @click="onClick(i)"></li>
+      <li :key="i" v-else v-show="mode === 'fill'"
+      :class="['kt-icon-color-blank' + (value === i ? '-hl' : '')]"
+      @click="onClick('blank')"></li>
+    </template>
   </ul>
 </template>
 
@@ -12,7 +17,7 @@ export default {
   props: {
     mode: {
       type: String,
-      default: 'strokeColor' // strokeColor fill
+      default: 'stroke' // stroke fill
     },
     value: {
       type: String,
@@ -26,8 +31,9 @@ export default {
   },
   methods: {
     onClick (val) {
-      this.value = val
-      // this.$store.CHANGE_SETTINGS({ key: this.mode, value: val })
+      let state = { currentColor: val }
+      state[this.mode] = val
+      this.$store.commit('CHANGE_STATE', state)
     }
   }
 }

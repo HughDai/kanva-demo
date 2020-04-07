@@ -1,7 +1,9 @@
 <template>
   <popper offset="0,6px">
     <ul slot="content" class="popper-content popper-graph">
-      <li v-for="(graph, j) in graphs" :key="j" :class="'kt-icon-'+ graph.name"></li>
+      <li v-for="(graph, j) in graphs" :key="j"
+      :class="['kt-icon-'+ graph.name, {'kt-hl': value === graph.name}]"
+      @click="onClick(graph)"></li>
     </ul>
     <a class="kt-icon-arrow-28" slot="reference"></a>
   </popper>
@@ -12,6 +14,9 @@ import popper from './popper'
 
 export default {
   name: 'PopperGraph',
+  props: {
+    value: String
+  },
   components: {
     popper
   },
@@ -29,6 +34,14 @@ export default {
         { name: 'semicircle', class: 'Semicircle' },
         { name: 'custom', class: 'Custom' }
       ]
+    }
+  },
+  methods: {
+    onClick (graph) {
+      this.$store.commit('CHANGE_STATE', {
+        selectedGraph: graph.name,
+        graphClass: graph.class
+      })
     }
   }
 }
