@@ -7,7 +7,9 @@ export default class Line extends Graph {
     super(options)
     this.name = 'brush'
     Object.assign(this.config, {
-      tension: 1,
+      // tension: 1,
+      // 平滑无毛刺
+      bezier: true,
       lineCap: 'round',
       lineJoin: 'round',
       draggable: false
@@ -31,6 +33,7 @@ export default class Line extends Graph {
     if (!this.instance.getLayer()) this.layer.add(this.instance)
     const pos = this.stage.getPointerPosition()
     var newPoints = this.instance.points().concat([pos.x, pos.y])
+
     this.instance.points(newPoints)
     this.layer.batchDraw()
   }

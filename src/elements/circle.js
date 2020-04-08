@@ -26,7 +26,7 @@ export default class Circle extends Graph {
         name: 'circleCenter',
         x: pos.x,
         y: pos.y,
-        radius: this.config.strokeWidth * 4,
+        radius: 4,
         fill: 'black',
         draggable: false
       })

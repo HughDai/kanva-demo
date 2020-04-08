@@ -23,14 +23,15 @@
         <line-style v-show="showLineStyle"></line-style>
         <eraser-style v-show="showEraserSetting" :value="eraserWidth"></eraser-style>
         <graph-style v-show="showGraphSetting" :mode="graphStyleMode"
-        :fill="fill || 'blank'" :stroke="stroke || 'red'"></graph-style>
+        :fill="fill" :stroke="stroke"></graph-style>
         <color v-show="showColor" :value="currentColor" :mode="graphStyleMode"></color>
       </div>
       <aside class="kt-operations">
         <i class="kt-separator"></i>
-        <ul class="kt-selector-list">
+        <ul class="kt-selector-list" >
           <template v-for="(operation, i) in operations">
-            <li :key="i" :class="['kt-selector', 'kt-icon-' + operation]"></li>
+            <li :key="i" :class="['kt-selector', 'kt-icon-' + operation]"
+            @click="handleOperate(operation)"></li>
             <i class="kt-separator" v-if="i === 3" :key="i+'separator'"></i>
           </template>
           <popper-countdown></popper-countdown>
@@ -44,10 +45,12 @@
       :class="{'hl': currentBoardPage === i + 1}"
       @click="changeBoardPage(i)">{{i + 1}}</li>
     </ul>
+    <stage ref="stage"></stage>
   </div>
 </template>
 
 <script>
+import stage from '@/components/stage'
 import strokeWidth from './stroke-width'
 import eraserStyle from './eraser-style'
 import lineStyle from './line-style'
@@ -61,6 +64,7 @@ import { mapState } from 'vuex'
 export default {
   name: 'Toolbar',
   components: {
+    stage,
     strokeWidth,
     eraserStyle,
     lineStyle,
@@ -74,17 +78,12 @@ export default {
     return {
       visible: true,
       currentBoardPage: 0,
+      currentStage: {},
       boards: [
         { style: 'white' },
         { style: 'black' },
         { style: 'english' }
       ],
-      settings: {
-        stroke: '',
-        strokeWidth: '',
-        fill: '',
-        dashEnabled: false
-      },
       // 状态控制中间settings显示
       modes: ['mouse', 'brush', 'eraser', 'line', 'graph', 'whiteboard', 'countdown'],
       // 左侧
@@ -121,6 +120,9 @@ export default {
       return this.currentMode === 'whiteboard'
     }
   },
+  mounted () {
+    this.currentStage = this.$refs.stage
+  },
   methods: {
     handleVisible () {
       this.visible = !this.visible
@@ -136,7 +138,10 @@ export default {
       } else {
         state.graphClass = ''
       }
-      this.$store.commit('CHANGE_STATE', state)
+      this.$store.commit('setState', state)
+    },
+    handleOperate (operation) {
+      this.currentStage[operation].call(undefined)
     }
   }
 }

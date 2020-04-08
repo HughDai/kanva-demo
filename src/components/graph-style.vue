@@ -26,7 +26,7 @@ export default {
   methods: {
     changeMode (val) {
       let currentColor = val === 'fill' ? this.fill : this.stroke
-      this.$store.commit('CHANGE_STATE', { graphStyleMode: val, currentColor })
+      this.$store.commit('setState', { graphStyleMode: val, currentColor })
     }
   }
 }

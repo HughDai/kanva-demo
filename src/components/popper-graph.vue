@@ -30,7 +30,7 @@ export default {
         { name: 'rectangle', class: 'Rect' },
         { name: 'rhombus', class: 'Rect' },
         { name: 'trapezoid', class: 'Rect' },
-        { name: 'circle', class: 'Cirlce' },
+        { name: 'circle', class: 'Circle' },
         { name: 'semicircle', class: 'Semicircle' },
         { name: 'custom', class: 'Custom' }
       ]
@@ -38,7 +38,8 @@ export default {
   },
   methods: {
     onClick (graph) {
-      this.$store.commit('CHANGE_STATE', {
+      this.$store.commit('setState', {
+        currentMode: 'graph',
         selectedGraph: graph.name,
         graphClass: graph.class
       })

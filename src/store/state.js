@@ -6,8 +6,17 @@ export default {
   lineStyle: 'solid',
   currentColor: 'red',
   eraserWidth: 'medium',
-  stroke: '',
+  stroke: 'red',
   strokeWidth: 'medium',
-  fill: '',
-  dashEnabled: false
+  fill: 'blank',
+  dashEnabled: false,
+
+  lastMainStage: {},
+  lastBoardStage: {},
+
+  mainHistory: [],
+  mainHistoryId: '',
+
+  boardHistory: [],
+  boardHistoryId: ''
 }

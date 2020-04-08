@@ -32,7 +32,7 @@ export default class Custom extends Graph {
       x: pos.x,
       y: pos.y,
       fill: 'red',
-      radius: this.config.strokeWidth * 4
+      radius: 4
     })
     this.lastLine = new Konva.Line({
       name: 'customLine',

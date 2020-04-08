@@ -22,7 +22,7 @@ export default {
   },
   methods: {
     onClick (val) {
-      this.$store.commit('CHANGE_STATE', { eraserWidth: val })
+      this.$store.commit('setState', { eraserWidth: val })
     }
   }
 }

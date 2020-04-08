@@ -29,7 +29,7 @@ export default {
   methods: {
     onClick (val) {
       this.value = val
-      this.$store.commit('CHANGE_STATE', { lineStyle: val })
+      this.$store.commit('setState', { lineStyle: val })
     }
   }
 }

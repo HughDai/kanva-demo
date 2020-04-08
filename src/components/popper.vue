@@ -2,6 +2,7 @@
   <popper
   :trigger="trigger"
   :delayOnMouseOut=30
+  :stopPropagation="true"
   :options="{
     placement: placement,
     modifiers: { offset: { offset: offset } }

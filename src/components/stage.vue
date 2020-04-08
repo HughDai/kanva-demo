@@ -4,41 +4,12 @@
 
 <script>
 /* eslint-disable */
-const STROKE_WIDTH_ENUMS = {
-  'small': 1,
-  'medium': 2,
-  'large': 3
-}
-const ERASER_WIDTH_ENUMS = {
-  'small': 3,
-  'medium': 5,
-  'large': 7
-}
-const COLOR_ENUMS = {
-  'blank': '',
-  'black': 'black',
-  'red': 'red',
-  'blue': 'blue',
-  'yellow': 'yellow',
-  'white': 'white',
-  'lightblue': '#01F8FF'
-}
+const CAN_DRAW_MODE = ['brush', 'eraser', 'line', 'graph']
 
 import Line from '@/elements/line'
-import Brush from '@/elements/brush'
-import Circle from '@/elements/circle'
-import Semicircle from '@/elements/semicircle'
-// import Polygon from '@/elements/polygon'
-import Triangle from '@/elements/triangle'
-import Rect from '@/elements/rect'
-import Custom from '@/elements/custom'
-import toolbar from '@/components/toolbar'
 import { mapState } from 'vuex'
+import { STROKE_WIDTH_ENUMS, ERASER_WIDTH_ENUMS, COLOR_ENUMS, GRAPH_CLASSES } from '@/elements/constants'
 import { TriangleSceneFunc, RectSceneFunc, PolygonSceneFunc, CustomLayer } from '@/elements/util'
-
-const classes = {
-  Line, Brush, Circle, Semicircle, Triangle, Rect, Custom
-}
 
 export default {
   name: 'Stage',
@@ -56,23 +27,19 @@ export default {
     }
   },
   watch: {
-    currentMode (nV, oV) {
-      if (nV === oV) return
-      this.detachDrawEvents()
-      this.attachStageEvents()
-      if (!['brush', 'eraser', 'line', 'graph'].includes(this.currentMode)) return
-      let isBrush = this.currentMode === 'brush' || this.currentMode === 'eraser'
-      const config = {
-        layer: isBrush ? this.brushLayer : this.customLayer,
-        mode: this.selectedGraph,
-        ...this.config
-      }
-      if (this.currentMode === 'brush') config.mode = 'brush'
-      let className = (this.graphClass || this.currentMode).replace(/\w/, m => m.toUpperCase())
-      console.log(className)
-      if (this.currentMode === 'eraser') className = 'Brush'
-      let klass = classes[className]
-      this.currentInstance = new klass(config)
+    graphConfig: {
+      handler (nV, oV) {
+        console.log(nV)
+        this.createInstance()
+      },
+      deep: true
+    },
+    settingConfig: {
+      handler (nV, oV) {
+        console.log(nV)
+        this.createInstance()
+      },
+      deep: true
     }
   },
   computed: {
@@ -81,7 +48,7 @@ export default {
       'currentColor', 'eraserWidth', 'stroke',
       'strokeWidth', 'fill', 'dashEnabled'
     ]),
-    config () {
+    settingConfig () {
       return {
         fill: COLOR_ENUMS[this.fill],
         stroke: COLOR_ENUMS[this.stroke],
@@ -90,13 +57,20 @@ export default {
           : STROKE_WIDTH_ENUMS[this.strokeWidth],
         dashEnabled: this.lineStyle === 'dash',
       }
+    },
+    graphConfig () {
+      return {
+        currentMode: this.currentMode,
+        selectedGraph: this.selectedGraph,
+        graphClass: this. graphClass
+      }
     }
   },
   mounted () {
     this.stage = new Konva.Stage({
       container: 'container',
-      width: 1000,
-      height: 750
+      width: 800,
+      height: 600
     })
     this.customLayer = new CustomLayer({ name: 'customLayer' })
     this.stage.add(this.customLayer)
@@ -109,6 +83,35 @@ export default {
     this.attachStageEvents()
   },
   methods: {
+    createInstance () {
+      this.detachDrawEvents()
+      this.attachStageEvents()
+      if (!CAN_DRAW_MODE.includes(this.currentMode)) return
+      let isBrushMode = this.currentMode === 'brush' || this.currentMode === 'eraser'
+      let mode = this.selectedGraph.indexOf('circle') > -1 ? 'center' : this.selectedGraph
+      const config = {
+        mode,
+        ...this.settingConfig,
+        layer: isBrushMode ? this.brushLayer : this.customLayer,
+        callback: function () {
+          this.detachDrawEvents()
+          this.attachStageEvents()
+        }
+      }
+      if (isBrushMode) {
+        config.mode = this.currentMode
+        this.customLayer.hitGraphEnabled(false)
+        this.brushLayer.hitGraphEnabled(true)
+      } else {
+        this.customLayer.hitGraphEnabled(true)
+        this.brushLayer.hitGraphEnabled(false)
+      }
+
+      let className = (this.graphClass || this.currentMode).replace(/\w/, m => m.toUpperCase())
+      className = isBrushMode ? 'Brush' : className
+      let klass = GRAPH_CLASSES[className]
+      this.currentInstance = new klass(config)
+    },
     attachStageEvents () {
       this.stage.on('click tap', e => {
         console.log(this.customLayer.children.length)
@@ -133,8 +136,6 @@ export default {
         } else if (target.hasName('circleWithCenter') || target.hasName('circleCenter')) {
           target = target.getParent()
         }
-
-        // e.evt.cancelBubble = true
 
         this.stage.find('Transformer').destroy()
 
@@ -167,8 +168,8 @@ export default {
     },
     reload () {
       const lastStageJSON = this.stageHistory[this.stageHistoryStep]
-      console.log('stage object ---- ', this.stage.toObject())
-      console.log('lastStageJSON reload ----- ', lastStageJSON)
+      // console.log('stage object ---- ', this.stage.toObject())
+      // console.log('lastStageJSON reload ----- ', lastStageJSON)
       const stageObj = JSON.parse(lastStageJSON)
       let customLayerData = stageObj.children[0]
       let brushLayerData = stageObj.children[1]
@@ -189,18 +190,9 @@ export default {
       this.customLayer.batchDraw()
       this.brushLayer.batchDraw()
     },
-    draw (mode) {
-      if (!this.isBrushMode) return
-      this.detachDrawEvents()
-      this.attachStageEvents()
-      if (!this.brush) {
-        this.brush = new Brush({ layer: this.brushLayer, mode, ...this.config })
-      } else {
-        this.brush.globalCompositeOperation('destination-out')
-      }
-    },
     remove () {
       const element = this.customLayer.selectedElement
+      console.log(element)
       if (element === null) {
         alert('please select one graph')
         return
@@ -254,8 +246,8 @@ export default {
     handleHistory () {
       const stageJSON = this.stage.toJSON()
       const lastStageJSON = this.stageHistory[this.stageHistoryStep]
-      console.log('stagejson====', stageJSON)
-      console.log('laststagejson====', lastStageJSON)
+      // console.log('stagejson====', stageJSON)
+      // console.log('laststagejson====', lastStageJSON)
       console.log(stageJSON !== lastStageJSON)
       if (stageJSON !== lastStageJSON) {
         this.pushHistory(stageJSON)

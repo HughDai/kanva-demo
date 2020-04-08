@@ -54,42 +54,21 @@
     <div id="toolbar-wrapper">
       <toolbar></toolbar>
     </div>
-    <!-- <div class="bg">
-      <button>test124344234234</button>
-    </div> -->
-    <stage ref="stage"></stage>
+    <!-- <stage></stage> -->
   </div>
 </template>
 
 <script>
 /* eslint-disable */ 
-import { mapState, mapMutations } from 'vuex'
-import Line from '@/elements/line'
-import Brush from '@/elements/brush'
-import Circle from '@/elements/circle'
-import Semicircle from '@/elements/semicircle'
-import Polygon from '@/elements/polygon'
-import Triangle from '@/elements/triangle'
-import Rect from '@/elements/rect'
-import Custom from '@/elements/custom'
 import toolbar from '@/components/toolbar'
-import stage from '@/components/stage'
-import { TriangleSceneFunc, RectSceneFunc, PolygonSceneFunc, CustomLayer } from '@/elements/util'
+// import stage from '@/components/stage'
 
 export default {
   name: "App",
-  data () {
-    return {
-      currentStage: null
-    }
-  },
   components: {
-    toolbar,
-    stage
-  },
-  mounted () {
-    this.currentStage = this.$refs.stage
-  },
+    toolbar
+    // stage
+  }
 }
 </script>
 

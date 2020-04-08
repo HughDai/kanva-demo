@@ -33,7 +33,7 @@ export default {
     onClick (val) {
       let state = { currentColor: val }
       state[this.mode] = val
-      this.$store.commit('CHANGE_STATE', state)
+      this.$store.commit('setState', state)
     }
   }
 }

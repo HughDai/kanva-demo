@@ -30,7 +30,6 @@ $line-styles: (dash, solid);
 
 .#{$scope}container {
   position: relative;
-  cursor: pointer;
 }
 .#{$scope}main {
   display: flex;
@@ -39,6 +38,7 @@ $line-styles: (dash, solid);
   width: 800px;
   height: 40px;
   padding: 0 6px;
+  cursor: pointer;
   aside {
     display: flex;
   }
